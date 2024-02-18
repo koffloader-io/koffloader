@@ -5,4 +5,4 @@
 
 package v1
 
-type MybookExpansion interface{}
+type KclusterExpansion interface{}

@@ -21,9 +21,9 @@ helm repo add koffloader https://koffloader-io.github.io/koffloader
 
 ```shell
 
-cat <<EOF > mybook1.yaml
+cat <<EOF > kcluster1.yaml
 apiVersion: koffloader.koffloader.io/v1
-kind: Mybook
+kind: Kcluster
 metadata:
   name: test1
 spec:
@@ -31,12 +31,12 @@ spec:
   subnet: "1.0.0.0/8"
 EOF
 
-kubectl apply -f mybook1.yaml
+kubectl apply -f kcluster1.yaml
 
 
-cat <<EOF > mybook2.yaml
+cat <<EOF > kcluster2.yaml
 apiVersion: koffloader.koffloader.io/v1
-kind: Mybook
+kind: Kcluster
 metadata:
   name: test2
 spec:
@@ -44,7 +44,7 @@ spec:
   subnet: "2.0.0.0/8"
 EOF
 
-kubectl apply -f mybook2.yaml
+kubectl apply -f kcluster2.yaml
 
 
 ```

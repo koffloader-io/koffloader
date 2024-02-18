@@ -15,7 +15,7 @@ import (
 
 type koffloaderV1Interface interface {
 	RESTClient() rest.Interface
-	MybooksGetter
+	KclustersGetter
 }
 
 // koffloaderV1Client is used to interact with features provided by the koffloader.koffloader.io group.
@@ -23,8 +23,8 @@ type koffloaderV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *koffloaderV1Client) Mybooks() MybookInterface {
-	return newMybooks(c)
+func (c *koffloaderV1Client) Kclusters() KclusterInterface {
+	return newKclusters(c)
 }
 
 // NewForConfig creates a new koffloaderV1Client for the given config.

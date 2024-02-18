@@ -5,18 +5,18 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
-  name: mybooks.koffloader.koffloader.io
+  name: kclusters.koffloader.koffloader.io
 spec:
   group: koffloader.koffloader.io
   names:
     categories:
     - koffloader
-    kind: Mybook
-    listKind: MybookList
-    plural: mybooks
+    kind: Kcluster
+    listKind: KclusterList
+    plural: kclusters
     shortNames:
     - mb
-    singular: mybook
+    singular: kcluster
   scope: Cluster
   versions:
   - additionalPrinterColumns:

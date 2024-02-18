@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type MybookSpec struct {
+type KclusterSpec struct {
 	// +kubebuilder:validation:Enum=4;6
 	// +kubebuilder:validation:Optional
 	IPVersion *int64 `json:"ipVersion,omitempty"`
@@ -38,7 +38,7 @@ type MybookSpec struct {
 	NodeAffinity *metav1.LabelSelector `json:"nodeAffinity,omitempty"`
 }
 
-type MybookStatus struct {
+type KclusterStatus struct {
 	// +kubebuilder:validation:Minimum=0
 	TotalIPCount int64 `json:"totalIPCount"`
 
@@ -49,7 +49,7 @@ type MybookStatus struct {
 }
 
 // scope(Namespaced or Cluster)
-// +kubebuilder:resource:categories={koffloader},path="mybooks",singular="mybook",scope="Cluster",shortName={mb}
+// +kubebuilder:resource:categories={koffloader},path="kclusters",singular="kcluster",scope="Cluster",shortName={mb}
 // +kubebuilder:printcolumn:JSONPath=".spec.ipVersion",description="ipVersion",name="VERSION",type=string
 // +kubebuilder:printcolumn:JSONPath=".spec.subnet",description="subnet",name="SUBNET",type=string
 // +kubebuilder:printcolumn:JSONPath=".status.totalIPCount",description="totalIPCount",name="TOTAL-IP-COUNT",type=integer
@@ -58,23 +58,23 @@ type MybookStatus struct {
 // +genclient
 // +genclient:nonNamespaced
 
-type Mybook struct {
+type Kcluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
 
-	Spec   MybookSpec   `json:"spec,omitempty"`
-	Status MybookStatus `json:"status,omitempty"`
+	Spec   KclusterSpec   `json:"spec,omitempty"`
+	Status KclusterStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-type MybookList struct {
+type KclusterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 
-	Items []Mybook `json:"items"`
+	Items []Kcluster `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Mybook{}, &MybookList{})
+	SchemeBuilder.Register(&Kcluster{}, &KclusterList{})
 }

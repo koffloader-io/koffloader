@@ -19,58 +19,58 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// MybookInformer provides access to a shared informer and lister for
-// Mybooks.
-type MybookInformer interface {
+// KclusterInformer provides access to a shared informer and lister for
+// Kclusters.
+type KclusterInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.MybookLister
+	Lister() v1.KclusterLister
 }
 
-type mybookInformer struct {
+type kclusterInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 }
 
-// NewMybookInformer constructs a new informer for Mybook type.
+// NewKclusterInformer constructs a new informer for Kcluster type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewMybookInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredMybookInformer(client, resyncPeriod, indexers, nil)
+func NewKclusterInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredKclusterInformer(client, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredMybookInformer constructs a new informer for Mybook type.
+// NewFilteredKclusterInformer constructs a new informer for Kcluster type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredMybookInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredKclusterInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.koffloaderV1().Mybooks().List(context.TODO(), options)
+				return client.koffloaderV1().Kclusters().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.koffloaderV1().Mybooks().Watch(context.TODO(), options)
+				return client.koffloaderV1().Kclusters().Watch(context.TODO(), options)
 			},
 		},
-		&koffloaderspidernetiov1.Mybook{},
+		&koffloaderspidernetiov1.Kcluster{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *mybookInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredMybookInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *kclusterInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredKclusterInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *mybookInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&koffloaderspidernetiov1.Mybook{}, f.defaultInformer)
+func (f *kclusterInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&koffloaderspidernetiov1.Kcluster{}, f.defaultInformer)
 }
 
-func (f *mybookInformer) Lister() v1.MybookLister {
-	return v1.NewMybookLister(f.Informer().GetIndexer())
+func (f *kclusterInformer) Lister() v1.KclusterLister {
+	return v1.NewKclusterLister(f.Informer().GetIndexer())
 }

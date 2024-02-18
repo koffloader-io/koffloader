@@ -18,7 +18,7 @@ webhooks:
         name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/mutate-koffloader-koffloader-io-v1-mybook"
+        path: "/mutate-koffloader-koffloader-io-v1-kcluster"
         port: {{ .Values.koffloaderController.webhookPort }}
       {{- if (eq .Values.koffloaderController.tls.method "provided") }}
       caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
@@ -27,7 +27,7 @@ webhooks:
       {{- end }}
     failurePolicy: Fail
     # ====modify====
-    name: mybook.koffloader.koffloader.io
+    name: kcluster.koffloader.koffloader.io
     rules:
       - apiGroups:
           # ====modify====
@@ -40,7 +40,7 @@ webhooks:
           - DELETE
         resources:
           # ====modify==== crdName
-          - mybooks
+          - kclusters
     sideEffects: None
 
 ---
@@ -60,7 +60,7 @@ webhooks:
         name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/validate-koffloader-koffloader-io-v1-mybook"
+        path: "/validate-koffloader-koffloader-io-v1-kcluster"
         port: {{ .Values.koffloaderController.webhookPort }}
       {{- if (eq .Values.koffloaderController.tls.method "provided") }}
       caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
@@ -69,7 +69,7 @@ webhooks:
       {{- end }}
     failurePolicy: Fail
     # ====modify====
-    name: mybook.koffloader.koffloader.io
+    name: kcluster.koffloader.koffloader.io
     rules:
       - apiGroups:
           # ====modify====
@@ -82,7 +82,7 @@ webhooks:
           - DELETE
         resources:
           # ====modify==== crdName
-          - mybooks
+          - kclusters
     sideEffects: None
 
 {{- if eq .Values.koffloaderController.tls.method "certmanager" -}}

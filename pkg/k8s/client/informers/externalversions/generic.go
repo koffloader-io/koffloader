@@ -40,8 +40,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=koffloader.koffloader.io, Version=v1
-	case v1.SchemeGroupVersion.WithResource("mybooks"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.koffloader().V1().Mybooks().Informer()}, nil
+	case v1.SchemeGroupVersion.WithResource("kclusters"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.koffloader().V1().Kclusters().Informer()}, nil
 
 	}
 

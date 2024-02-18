@@ -1,7 +1,7 @@
 // Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
-package mybookManager
+package kclusterManager
 
 import (
 	"context"
@@ -35,7 +35,7 @@ type informerHandler struct {
 	leaseId        string
 	eventRecord    record.EventRecorder
 	queue          workqueue.RateLimitingInterface
-	crdlister      crdlisterv1.MybookLister
+	crdlister      crdlisterv1.KclusterLister
 	k8sclient      crdclientset.Interface
 }
 
@@ -51,7 +51,7 @@ func (s *informerHandler) processNextWorkItem(ctx context.Context) bool {
 	}
 	defer s.queue.Done(key)
 
-	err := s.syncHandler(ctx, key.(*crd.Mybook))
+	err := s.syncHandler(ctx, key.(*crd.Kcluster))
 	if err == nil {
 		s.queue.Forget(key)
 	} else {
@@ -71,29 +71,29 @@ func (s *informerHandler) processNextWorkItem(ctx context.Context) bool {
 
 func (s *informerHandler) informerAddHandler(obj interface{}) {
 
-	r, ok := obj.(*crd.Mybook)
+	r, ok := obj.(*crd.Kcluster)
 	if !ok {
 		s.logger.Sugar().Errorf("failed to get crd: %+v", obj)
 		return
 	}
-	s.logger.Sugar().Infof("add mybook : %+v", r)
+	s.logger.Sugar().Infof("add kcluster : %+v", r)
 
 	// enqueue
 	s.queue.AddRateLimited(r)
 
 	// 基于工作队列，生产者和消费者模型，使得事件能够本可靠的 异步执行 成功
 	// 例如 resourceVersion、断网等失败，最终都能够不断重试而手工
-	s.eventRecord.Eventf(r, corev1.EventTypeNormal, "newMybook", "crd event, new mybook %v", r.Name)
+	s.eventRecord.Eventf(r, corev1.EventTypeNormal, "newKcluster", "crd event, new kcluster %v", r.Name)
 
 }
 
 func (s *informerHandler) informerUpdateHandler(oldObj interface{}, newObj interface{}) {
-	_, ok := oldObj.(*crd.Mybook)
+	_, ok := oldObj.(*crd.Kcluster)
 	if !ok {
 		s.logger.Sugar().Errorf("failed to get crd: %+v", oldObj)
 		return
 	}
-	newone, ok := newObj.(*crd.Mybook)
+	newone, ok := newObj.(*crd.Kcluster)
 	if !ok {
 		s.logger.Sugar().Errorf("failed to get crd: %+v", newObj)
 		return
@@ -108,13 +108,13 @@ func (s *informerHandler) informerUpdateHandler(oldObj interface{}, newObj inter
 	// 		return s.handleCrdEvent(context.Background(), curPod)
 	// 	})
 	// 	if err != nil {
-	// 		s.logger.Sugar().Errorf("failed to update mybook status, error=%v", err)
+	// 		s.logger.Sugar().Errorf("failed to update kcluster status, error=%v", err)
 	// 	}
 	// }
 }
 
 func (s *informerHandler) informerDeleteHandler(obj interface{}) {
-	r, ok := obj.(*crd.Mybook)
+	r, ok := obj.(*crd.Kcluster)
 	if !ok {
 		s.logger.Sugar().Errorf("failed to get crd: %+v", obj)
 		return
@@ -166,7 +166,7 @@ func (s *informerHandler) executeInformer() {
 	factory := externalversions.NewSharedInformerFactory(clientset, 0)
 	// 注意，一个 factory 下  对同一种 CRD 不能 创建 多个Informer，不然会 数据竞争 问题。 而 一个 factory 下， 可对不同 CRD 产生 各种的 Informer
 
-	t := factory.koffloader().V1().Mybooks()
+	t := factory.koffloader().V1().Kclusters()
 	s.crdlister = t.Lister()
 
 	inform := t.Informer()
@@ -191,7 +191,7 @@ func (s *informerHandler) executeInformer() {
 	go func() {
 		s.logger.Info("start worker")
 
-		if !cache.WaitForNamedCacheSync("mybook-controller", ctx.Done(), inform.HasSynced) {
+		if !cache.WaitForNamedCacheSync("kcluster-controller", ctx.Done(), inform.HasSynced) {
 			s.logger.Error("failed to sync cache")
 			cancel()
 			return
@@ -206,7 +206,7 @@ func (s *informerHandler) executeInformer() {
 
 }
 
-func (s *mybookManager) RunController(leaseName, leaseNameSpace string, leaseId string) {
+func (s *kclusterManager) RunController(leaseName, leaseNameSpace string, leaseId string) {
 
 	scheme, e := crd.SchemeBuilder.Build()
 	if e != nil {
@@ -216,9 +216,9 @@ func (s *mybookManager) RunController(leaseName, leaseNameSpace string, leaseId 
 		Events:
 		  Type    Reason     Age   From    Message
 		  ----    ------     ----  ----    -------
-		  Normal  newMybook  13s   mybook  crd event, new mybook test
+		  Normal  newKcluster  13s   kcluster  crd event, new kcluster test
 	*/
-	p := k8s.NewEventRecord(scheme, "mybook", s.logger)
+	p := k8s.NewEventRecord(scheme, "kcluster", s.logger)
 
 	// -----------
 	t := &informerHandler{
@@ -227,7 +227,7 @@ func (s *mybookManager) RunController(leaseName, leaseNameSpace string, leaseId 
 		leaseNameSpace: leaseNameSpace,
 		leaseId:        leaseId,
 		eventRecord:    p,
-		queue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "mybook"),
+		queue:          workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "kcluster"),
 	}
 	s.informer = t
 

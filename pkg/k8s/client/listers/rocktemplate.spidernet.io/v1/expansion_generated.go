@@ -5,6 +5,6 @@
 
 package v1
 
-// MybookListerExpansion allows custom methods to be added to
-// MybookLister.
-type MybookListerExpansion interface{}
+// KclusterListerExpansion allows custom methods to be added to
+// KclusterLister.
+type KclusterListerExpansion interface{}

@@ -15,8 +15,8 @@ type FakekoffloaderV1 struct {
 	*testing.Fake
 }
 
-func (c *FakekoffloaderV1) Mybooks() v1.MybookInterface {
-	return &FakeMybooks{c}
+func (c *FakekoffloaderV1) Kclusters() v1.KclusterInterface {
+	return &FakeKclusters{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

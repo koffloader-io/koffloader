@@ -16,15 +16,15 @@
 
 4. redefine CRD in pkg/k8s/v1
     rename directory name 'pkg/k8s/apis/koffloader.koffloader.io' 
-    replace all 'mybook' to 'YourCRDName'
-    and `make update_crd_sdk`, and write code in pkg/mybookManager
+    replace all 'kcluster' to 'YourCRDName'
+    and `make update_crd_sdk`, and write code in pkg/kclusterManager
 
-    rename pkg/mybookManager and replace all 'mybook' with your CRD name in this directory
+    rename pkg/kclusterManager and replace all 'kcluster' with your CRD name in this directory
 
-    rm charts/crds/koffloader.koffloader.io_mybooks.yaml 
+    rm charts/crds/koffloader.koffloader.io_kclusters.yaml 
 
-    # in repo: replace all "github.com/koffloader-io/spiderdoctor/pkg/mybookManager" to "github.com/koffloader-io/spiderdoctor/pkg/${crdName}Manager"
-    # in repo: find and replace all "mybook" to YourCrd
+    # in repo: replace all "github.com/koffloader-io/spiderdoctor/pkg/kclusterManager" to "github.com/koffloader-io/spiderdoctor/pkg/${crdName}Manager"
+    # in repo: find and replace all "kcluster" to YourCrd
 
 5. update charts/ , and images/ , and CODEOWNERS
 
@@ -98,16 +98,16 @@
 
 5. apply cr
 
-        cat <<EOF > mybook.yaml
+        cat <<EOF > kcluster.yaml
         apiVersion: koffloader.koffloader.io/v1
-        kind: Mybook
+        kind: Kcluster
         metadata:
           name: test
         spec:
           ipVersion: 4
           subnet: "1.0.0.0/8"
         EOF
-        kubectl apply -f mybook.yaml
+        kubectl apply -f kcluster.yaml
 
 ## chart develop
 

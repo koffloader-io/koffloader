@@ -1,7 +1,7 @@
 // Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
-package mybookManager
+package kclusterManager
 
 import (
 	"context"
@@ -29,7 +29,7 @@ var _ webhook.CustomValidator = (*webhookhander)(nil)
 func (s *webhookhander) Default(ctx context.Context, obj runtime.Object) error {
 	logger := s.logger.Named("mutating wehbook")
 
-	r, ok := obj.(*crd.Mybook)
+	r, ok := obj.(*crd.Kcluster)
 	if !ok {
 		s := "failed to get obj"
 		logger.Error(s)
@@ -50,7 +50,7 @@ func (s *webhookhander) Default(ctx context.Context, obj runtime.Object) error {
 func (s *webhookhander) ValidateCreate(ctx context.Context, obj runtime.Object) error {
 	logger := s.logger.Named("validating create webhook")
 
-	r, ok := obj.(*crd.Mybook)
+	r, ok := obj.(*crd.Kcluster)
 	if !ok {
 		s := "failed to get obj"
 		logger.Error(s)
@@ -64,13 +64,13 @@ func (s *webhookhander) ValidateCreate(ctx context.Context, obj runtime.Object) 
 func (s *webhookhander) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) error {
 	logger := s.logger.Named("validating update webhook")
 
-	old, ok := oldObj.(*crd.Mybook)
+	old, ok := oldObj.(*crd.Kcluster)
 	if !ok {
 		s := "failed to get oldObj"
 		logger.Error(s)
 		return apierrors.NewBadRequest(s)
 	}
-	new, ok := newObj.(*crd.Mybook)
+	new, ok := newObj.(*crd.Kcluster)
 	if !ok {
 		s := "failed to get newObj"
 		logger.Error(s)
@@ -86,7 +86,7 @@ func (s *webhookhander) ValidateUpdate(ctx context.Context, oldObj, newObj runti
 func (s *webhookhander) ValidateDelete(ctx context.Context, obj runtime.Object) error {
 	logger := s.logger.Named("validating delete webhook")
 
-	r, ok := obj.(*crd.Mybook)
+	r, ok := obj.(*crd.Kcluster)
 	if !ok {
 		s := "failed to get obj"
 		logger.Error(s)
@@ -101,7 +101,7 @@ func (s *webhookhander) ValidateDelete(ctx context.Context, obj runtime.Object) 
 
 // https://github.com/kubernetes-sigs/controller-runtime/blob/master/pkg/builder/example_webhook_test.go
 // https://github.com/kubernetes-sigs/controller-runtime/blob/master/pkg/builder/webhook_test.go
-func (s *mybookManager) RunWebhookServer(webhookPort int, tlsDir string) {
+func (s *kclusterManager) RunWebhookServer(webhookPort int, tlsDir string) {
 	logger := s.logger
 	r := &webhookhander{
 		logger: logger,
@@ -131,7 +131,7 @@ func (s *mybookManager) RunWebhookServer(webhookPort int, tlsDir string) {
 	// the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
 	// the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
 	e := ctrl.NewWebhookManagedBy(mgr).
-		For(&crd.Mybook{}).
+		For(&crd.Kcluster{}).
 		WithDefaulter(r).
 		WithValidator(r).
 		Complete()

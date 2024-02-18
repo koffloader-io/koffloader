@@ -61,7 +61,7 @@ rules:
 - apiGroups:
   - koffloader.koffloader.io
   resources:
-  - mybooks
+  - kclusters
   verbs:
   - create
   - delete
@@ -73,7 +73,7 @@ rules:
 - apiGroups:
   - koffloader.koffloader.io
   resources:
-  - mybooks/status
+  - kclusters/status
   verbs:
   - get
   - patch

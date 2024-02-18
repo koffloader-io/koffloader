@@ -6,7 +6,7 @@ package cmd
 import (
 	"context"
 	"github.com/koffloader-io/koffloader/pkg/debug"
-	"github.com/koffloader-io/koffloader/pkg/mybookManager"
+	"github.com/koffloader-io/koffloader/pkg/kclusterManager"
 	"github.com/koffloader-io/koffloader/pkg/types"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
@@ -52,7 +52,7 @@ func DaemonMain() {
 	MetricHistogramDuration.Record(context.Background(), 20)
 
 	// ----------
-	s := mybookManager.New(rootLogger.Named("mybook"))
+	s := kclusterManager.New(rootLogger.Named("kcluster"))
 	s.RunController("testlease", types.ControllerConfig.PodNamespace, types.ControllerConfig.PodName)
 	s.RunWebhookServer(int(types.ControllerConfig.WebhookPort), filepath.Dir(types.ControllerConfig.TlsServerCertPath))
 

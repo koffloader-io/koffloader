@@ -11,8 +11,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// Mybooks returns a MybookInformer.
-	Mybooks() MybookInformer
+	// Kclusters returns a KclusterInformer.
+	Kclusters() KclusterInformer
 }
 
 type version struct {
@@ -26,7 +26,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Mybooks returns a MybookInformer.
-func (v *version) Mybooks() MybookInformer {
-	return &mybookInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+// Kclusters returns a KclusterInformer.
+func (v *version) Kclusters() KclusterInformer {
+	return &kclusterInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }

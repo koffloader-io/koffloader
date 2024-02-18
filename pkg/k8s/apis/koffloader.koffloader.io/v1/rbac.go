@@ -5,8 +5,8 @@
 // https://github.com/kubernetes-sigs/controller-tools/blob/master/pkg/rbac/parser.go
 // https://book.kubebuilder.io/reference/markers/rbac.html
 
-// +kubebuilder:rbac:groups=koffloader.koffloader.io,resources=mybooks,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=koffloader.koffloader.io,resources=mybooks/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=koffloader.koffloader.io,resources=kclusters,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=koffloader.koffloader.io,resources=kclusters/status,verbs=get;update;patch
 
 // +kubebuilder:rbac:groups="",resources=events,verbs=create;get;list;watch;update;delete
 // +kubebuilder:rbac:groups="coordination.k8s.io",resources=leases,verbs=create;get;update

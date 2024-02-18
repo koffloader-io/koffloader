@@ -12,44 +12,44 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// MybookLister helps list Mybooks.
+// KclusterLister helps list Kclusters.
 // All objects returned here must be treated as read-only.
-type MybookLister interface {
-	// List lists all Mybooks in the indexer.
+type KclusterLister interface {
+	// List lists all Kclusters in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1.Mybook, err error)
-	// Get retrieves the Mybook from the index for a given name.
+	List(selector labels.Selector) (ret []*v1.Kcluster, err error)
+	// Get retrieves the Kcluster from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1.Mybook, error)
-	MybookListerExpansion
+	Get(name string) (*v1.Kcluster, error)
+	KclusterListerExpansion
 }
 
-// mybookLister implements the MybookLister interface.
-type mybookLister struct {
+// kclusterLister implements the KclusterLister interface.
+type kclusterLister struct {
 	indexer cache.Indexer
 }
 
-// NewMybookLister returns a new MybookLister.
-func NewMybookLister(indexer cache.Indexer) MybookLister {
-	return &mybookLister{indexer: indexer}
+// NewKclusterLister returns a new KclusterLister.
+func NewKclusterLister(indexer cache.Indexer) KclusterLister {
+	return &kclusterLister{indexer: indexer}
 }
 
-// List lists all Mybooks in the indexer.
-func (s *mybookLister) List(selector labels.Selector) (ret []*v1.Mybook, err error) {
+// List lists all Kclusters in the indexer.
+func (s *kclusterLister) List(selector labels.Selector) (ret []*v1.Kcluster, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1.Mybook))
+		ret = append(ret, m.(*v1.Kcluster))
 	})
 	return ret, err
 }
 
-// Get retrieves the Mybook from the index for a given name.
-func (s *mybookLister) Get(name string) (*v1.Mybook, error) {
+// Get retrieves the Kcluster from the index for a given name.
+func (s *kclusterLister) Get(name string) (*v1.Kcluster, error) {
 	obj, exists, err := s.indexer.GetByKey(name)
 	if err != nil {
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(v1.Resource("mybook"), name)
+		return nil, errors.NewNotFound(v1.Resource("kcluster"), name)
 	}
-	return obj.(*v1.Mybook), nil
+	return obj.(*v1.Kcluster), nil
 }

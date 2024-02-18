@@ -3,7 +3,7 @@
 
 package types
 
-type MybookManager interface {
+type KclusterManager interface {
 	RunWebhookServer(webhookPort int, tlsDir string)
 	RunController(leaseName, leaseNameSpace string, leaseId string)
 }
