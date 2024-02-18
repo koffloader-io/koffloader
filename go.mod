@@ -20,7 +20,7 @@ require (
 	github.com/sasha-s/go-deadlock v0.3.1
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
-	github.com/koffloader-io/e2eframework v0.0.0-20221012075947-0a835b3d4cf9
+	github.com/spidernet-io/e2eframework v0.0.0-20221012075947-0a835b3d4cf9
 	go.opentelemetry.io/otel v1.23.1
 	go.opentelemetry.io/otel/exporters/prometheus v0.45.2
 	go.opentelemetry.io/otel/metric v1.23.1

@@ -5,9 +5,9 @@ package example_test
 import (
 	"testing"
 
-	e2e "github.com/koffloader-io/e2eframework/framework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	e2e "github.com/spidernet-io/e2eframework/framework"
 	// "k8s.io/apimachinery/pkg/runtime"
 )
 
