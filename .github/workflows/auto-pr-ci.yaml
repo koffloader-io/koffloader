@@ -80,7 +80,7 @@ jobs:
               - '**/Dockerfile'
             all_e2e:
               - 'test/e2e/**/*.go'
-              - 'vendor/github.com/koffloader-io/**/*.go'
+              - 'vendor/github.com/spidernet-io/**/*.go'
 
       - name: Get Ref
         id: get_ref

@@ -1,51 +1,51 @@
-{{- if .Values.koffloaderAgent.prometheus.prometheusRule.install -}}
+{{- if .Values.rocktemplateAgent.prometheus.prometheusRule.install -}}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
-  namespace: {{ default .Release.Namespace .Values.koffloaderAgent.prometheus.prometheusRule.namespace }}
+  name: {{ .Values.rocktemplateAgent.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.rocktemplateAgent.prometheus.prometheusRule.namespace }}
   labels:
-    {{- include "project.koffloaderAgent.labels" . | nindent 4 }}
+    {{- include "project.rocktemplateAgent.labels" . | nindent 4 }}
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderAgent.prometheus.prometheusRule.labels }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.prometheusRule.labels "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateAgent.prometheus.prometheusRule.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.prometheus.prometheusRule.labels "context" $ ) | nindent 4 }}
     {{- end }}
-  {{- if or .Values.global.commonAnnotations .Values.koffloaderAgent.prometheus.prometheusRule.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.rocktemplateAgent.prometheus.prometheusRule.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderAgent.prometheus.prometheusRule.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.prometheusRule.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateAgent.prometheus.prometheusRule.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.prometheus.prometheusRule.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
   groups: []
 {{- end }}
 ---
-{{- if .Values.koffloaderController.prometheus.prometheusRule.install -}}
+{{- if .Values.rocktemplateController.prometheus.prometheusRule.install -}}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
-  namespace: {{ default .Release.Namespace .Values.koffloaderController.prometheus.prometheusRule.namespace }}
+  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.rocktemplateController.prometheus.prometheusRule.namespace }}
   labels:
-    {{- include "project.koffloaderController.labels" . | nindent 4 }}
+    {{- include "project.rocktemplateController.labels" . | nindent 4 }}
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderController.prometheus.prometheusRule.labels }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.prometheusRule.labels "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateController.prometheus.prometheusRule.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.prometheus.prometheusRule.labels "context" $ ) | nindent 4 }}
     {{- end }}
-  {{- if or .Values.global.commonAnnotations .Values.koffloaderController.prometheus.prometheusRule.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.rocktemplateController.prometheus.prometheusRule.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderController.prometheus.prometheusRule.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.prometheusRule.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateController.prometheus.prometheusRule.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.prometheus.prometheusRule.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:

@@ -16,6 +16,7 @@ package prometheus // import "go.opentelemetry.io/otel/exporters/prometheus"
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -24,10 +25,13 @@ import (
 	"unicode/utf8"
 
 	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
+	"google.golang.org/protobuf/proto"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric/unit"
+	"go.opentelemetry.io/otel/internal/global"
+	"go.opentelemetry.io/otel/sdk/instrumentation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -36,6 +40,15 @@ import (
 const (
 	targetInfoMetricName  = "target_info"
 	targetInfoDescription = "Target metadata"
+
+	scopeInfoMetricName  = "otel_scope_info"
+	scopeInfoDescription = "Instrumentation Scope metadata"
+)
+
+var (
+	scopeInfoKeys = [2]string{"otel_scope_name", "otel_scope_version"}
+
+	errScopeInvalid = errors.New("invalid scope")
 )
 
 // Exporter is a Prometheus Exporter that embeds the OTel metric.Reader
@@ -44,20 +57,54 @@ type Exporter struct {
 	metric.Reader
 }
 
+// MarshalLog returns logging data about the Exporter.
+func (e *Exporter) MarshalLog() interface{} {
+	const t = "Prometheus exporter"
+
+	if r, ok := e.Reader.(*metric.ManualReader); ok {
+		under := r.MarshalLog()
+		if data, ok := under.(struct {
+			Type       string
+			Registered bool
+			Shutdown   bool
+		}); ok {
+			data.Type = t
+			return data
+		}
+	}
+
+	return struct{ Type string }{Type: t}
+}
+
 var _ metric.Reader = &Exporter{}
+
+// keyVals is used to store resource attribute key value pairs.
+type keyVals struct {
+	keys []string
+	vals []string
+}
 
 // collector is used to implement prometheus.Collector.
 type collector struct {
 	reader metric.Reader
 
-	disableTargetInfo    bool
-	withoutUnits         bool
-	targetInfo           *metricData
-	createTargetInfoOnce sync.Once
+	withoutUnits             bool
+	withoutCounterSuffixes   bool
+	disableScopeInfo         bool
+	namespace                string
+	resourceAttributesFilter attribute.Filter
+
+	mu                sync.Mutex // mu protects all members below from the concurrent access.
+	disableTargetInfo bool
+	targetInfo        prometheus.Metric
+	scopeInfos        map[instrumentation.Scope]prometheus.Metric
+	scopeInfosInvalid map[instrumentation.Scope]struct{}
+	metricFamilies    map[string]*dto.MetricFamily
+	resourceKeyVals   keyVals
 }
 
-// prometheus counters MUST have a _total suffix:
-// https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/data-model.md#sums-1
+// prometheus counters MUST have a _total suffix by default:
+// https://github.com/open-telemetry/opentelemetry-specification/blob/v1.20.0/specification/compatibility/prometheus_and_openmetrics.md
 const counterSuffix = "_total"
 
 // New returns a Prometheus Exporter.
@@ -67,12 +114,19 @@ func New(opts ...Option) (*Exporter, error) {
 	// this assumes that the default temporality selector will always return cumulative.
 	// we only support cumulative temporality, so building our own reader enforces this.
 	// TODO (#3244): Enable some way to configure the reader, but not change temporality.
-	reader := metric.NewManualReader(cfg.manualReaderOptions()...)
+	reader := metric.NewManualReader(cfg.readerOpts...)
 
 	collector := &collector{
-		reader:            reader,
-		disableTargetInfo: cfg.disableTargetInfo,
-		withoutUnits:      cfg.withoutUnits,
+		reader:                   reader,
+		disableTargetInfo:        cfg.disableTargetInfo,
+		withoutUnits:             cfg.withoutUnits,
+		withoutCounterSuffixes:   cfg.withoutCounterSuffixes,
+		disableScopeInfo:         cfg.disableScopeInfo,
+		scopeInfos:               make(map[instrumentation.Scope]prometheus.Metric),
+		scopeInfosInvalid:        make(map[instrumentation.Scope]struct{}),
+		metricFamilies:           make(map[string]*dto.MetricFamily),
+		namespace:                cfg.namespace,
+		resourceAttributesFilter: cfg.resourceAttributesFilter,
 	}
 
 	if err := cfg.registerer.Register(collector); err != nil {
@@ -96,85 +150,109 @@ func (c *collector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 // Collect implements prometheus.Collector.
+//
+// This method is safe to call concurrently.
 func (c *collector) Collect(ch chan<- prometheus.Metric) {
-	metrics, err := c.reader.Collect(context.TODO())
+	// TODO (#3047): Use a sync.Pool instead of allocating metrics every Collect.
+	metrics := metricdata.ResourceMetrics{}
+	err := c.reader.Collect(context.TODO(), &metrics)
 	if err != nil {
+		if errors.Is(err, metric.ErrReaderShutdown) {
+			return
+		}
 		otel.Handle(err)
-		if err == metric.ErrReaderNotRegistered {
+		if errors.Is(err, metric.ErrReaderNotRegistered) {
 			return
 		}
 	}
 
-	for _, metricData := range c.getMetricData(metrics) {
-		if metricData.valueType == prometheus.UntypedValue {
-			m, err := prometheus.NewConstHistogram(metricData.description, metricData.histogramCount, metricData.histogramSum, metricData.histogramBuckets, metricData.attributeValues...)
+	global.Debug("Prometheus exporter export", "Data", metrics)
+
+	// Initialize (once) targetInfo and disableTargetInfo.
+	func() {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+
+		if c.targetInfo == nil && !c.disableTargetInfo {
+			targetInfo, err := createInfoMetric(targetInfoMetricName, targetInfoDescription, metrics.Resource)
 			if err != nil {
+				// If the target info metric is invalid, disable sending it.
+				c.disableTargetInfo = true
 				otel.Handle(err)
-				continue
+				return
 			}
-			ch <- m
-		} else {
-			m, err := prometheus.NewConstMetric(metricData.description, metricData.valueType, metricData.value, metricData.attributeValues...)
-			if err != nil {
-				otel.Handle(err)
-				continue
-			}
-			ch <- m
+
+			c.targetInfo = targetInfo
 		}
+	}()
+
+	if !c.disableTargetInfo {
+		ch <- c.targetInfo
 	}
-}
 
-// metricData holds the metadata as well as values for individual data points.
-type metricData struct {
-	// name should include the unit as a suffix (before _total on counters)
-	// see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/data-model.md#metric-metadata-1
-	name             string
-	description      *prometheus.Desc
-	attributeValues  []string
-	valueType        prometheus.ValueType
-	value            float64
-	histogramCount   uint64
-	histogramSum     float64
-	histogramBuckets map[float64]uint64
-}
-
-func (c *collector) getMetricData(metrics metricdata.ResourceMetrics) []*metricData {
-	allMetrics := make([]*metricData, 0)
-
-	c.createTargetInfoOnce.Do(func() {
-		// Resource should be immutable, we don't need to compute again
-		c.targetInfo = c.createInfoMetricData(targetInfoMetricName, targetInfoDescription, metrics.Resource)
-	})
-
-	if c.targetInfo != nil {
-		allMetrics = append(allMetrics, c.targetInfo)
+	if c.resourceAttributesFilter != nil && len(c.resourceKeyVals.keys) == 0 {
+		c.createResourceAttributes(metrics.Resource)
 	}
 
 	for _, scopeMetrics := range metrics.ScopeMetrics {
+		var keys, values [2]string
+
+		if !c.disableScopeInfo {
+			scopeInfo, err := c.scopeInfo(scopeMetrics.Scope)
+			if err == errScopeInvalid {
+				// Do not report the same error multiple times.
+				continue
+			}
+			if err != nil {
+				otel.Handle(err)
+				continue
+			}
+
+			ch <- scopeInfo
+
+			keys = scopeInfoKeys
+			values = [2]string{scopeMetrics.Scope.Name, scopeMetrics.Scope.Version}
+		}
+
 		for _, m := range scopeMetrics.Metrics {
+			typ := c.metricType(m)
+			if typ == nil {
+				continue
+			}
+			name := c.getName(m, typ)
+
+			drop, help := c.validateMetrics(name, m.Description, typ)
+			if drop {
+				continue
+			}
+
+			if help != "" {
+				m.Description = help
+			}
+
 			switch v := m.Data.(type) {
-			case metricdata.Histogram:
-				allMetrics = append(allMetrics, getHistogramMetricData(v, m, c.getName(m))...)
+			case metricdata.Histogram[int64]:
+				addHistogramMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
+			case metricdata.Histogram[float64]:
+				addHistogramMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
 			case metricdata.Sum[int64]:
-				allMetrics = append(allMetrics, getSumMetricData(v, m, c.getName(m))...)
+				addSumMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
 			case metricdata.Sum[float64]:
-				allMetrics = append(allMetrics, getSumMetricData(v, m, c.getName(m))...)
+				addSumMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
 			case metricdata.Gauge[int64]:
-				allMetrics = append(allMetrics, getGaugeMetricData(v, m, c.getName(m))...)
+				addGaugeMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
 			case metricdata.Gauge[float64]:
-				allMetrics = append(allMetrics, getGaugeMetricData(v, m, c.getName(m))...)
+				addGaugeMetric(ch, v, m, keys, values, name, c.resourceKeyVals)
 			}
 		}
 	}
-
-	return allMetrics
 }
 
-func getHistogramMetricData(histogram metricdata.Histogram, m metricdata.Metrics, name string) []*metricData {
+func addHistogramMetric[N int64 | float64](ch chan<- prometheus.Metric, histogram metricdata.Histogram[N], m metricdata.Metrics, ks, vs [2]string, name string, resourceKV keyVals) {
 	// TODO(https://github.com/open-telemetry/opentelemetry-go/issues/3163): support exemplars
-	dataPoints := make([]*metricData, 0, len(histogram.DataPoints))
 	for _, dp := range histogram.DataPoints {
-		keys, values := getAttrs(dp.Attributes)
+		keys, values := getAttrs(dp.Attributes, ks, vs, resourceKV)
+
 		desc := prometheus.NewDesc(name, m.Description, keys, nil)
 		buckets := make(map[float64]uint64, len(dp.Bounds))
 
@@ -183,66 +261,52 @@ func getHistogramMetricData(histogram metricdata.Histogram, m metricdata.Metrics
 			cumulativeCount += dp.BucketCounts[i]
 			buckets[bound] = cumulativeCount
 		}
-		md := &metricData{
-			name:             m.Name,
-			description:      desc,
-			attributeValues:  values,
-			valueType:        prometheus.UntypedValue,
-			histogramCount:   dp.Count,
-			histogramSum:     dp.Sum,
-			histogramBuckets: buckets,
+		m, err := prometheus.NewConstHistogram(desc, dp.Count, float64(dp.Sum), buckets, values...)
+		if err != nil {
+			otel.Handle(err)
+			continue
 		}
-		dataPoints = append(dataPoints, md)
+		ch <- m
 	}
-	return dataPoints
 }
 
-func getSumMetricData[N int64 | float64](sum metricdata.Sum[N], m metricdata.Metrics, name string) []*metricData {
+func addSumMetric[N int64 | float64](ch chan<- prometheus.Metric, sum metricdata.Sum[N], m metricdata.Metrics, ks, vs [2]string, name string, resourceKV keyVals) {
 	valueType := prometheus.CounterValue
 	if !sum.IsMonotonic {
 		valueType = prometheus.GaugeValue
 	}
-	dataPoints := make([]*metricData, 0, len(sum.DataPoints))
+
 	for _, dp := range sum.DataPoints {
-		if sum.IsMonotonic {
-			// Add _total suffix for counters
-			name += counterSuffix
-		}
-		keys, values := getAttrs(dp.Attributes)
+		keys, values := getAttrs(dp.Attributes, ks, vs, resourceKV)
+
 		desc := prometheus.NewDesc(name, m.Description, keys, nil)
-		md := &metricData{
-			name:            m.Name,
-			description:     desc,
-			attributeValues: values,
-			valueType:       valueType,
-			value:           float64(dp.Value),
+		m, err := prometheus.NewConstMetric(desc, valueType, float64(dp.Value), values...)
+		if err != nil {
+			otel.Handle(err)
+			continue
 		}
-		dataPoints = append(dataPoints, md)
+		ch <- m
 	}
-	return dataPoints
 }
 
-func getGaugeMetricData[N int64 | float64](gauge metricdata.Gauge[N], m metricdata.Metrics, name string) []*metricData {
-	dataPoints := make([]*metricData, 0, len(gauge.DataPoints))
+func addGaugeMetric[N int64 | float64](ch chan<- prometheus.Metric, gauge metricdata.Gauge[N], m metricdata.Metrics, ks, vs [2]string, name string, resourceKV keyVals) {
 	for _, dp := range gauge.DataPoints {
-		keys, values := getAttrs(dp.Attributes)
+		keys, values := getAttrs(dp.Attributes, ks, vs, resourceKV)
+
 		desc := prometheus.NewDesc(name, m.Description, keys, nil)
-		md := &metricData{
-			name:            m.Name,
-			description:     desc,
-			attributeValues: values,
-			valueType:       prometheus.GaugeValue,
-			value:           float64(dp.Value),
+		m, err := prometheus.NewConstMetric(desc, prometheus.GaugeValue, float64(dp.Value), values...)
+		if err != nil {
+			otel.Handle(err)
+			continue
 		}
-		dataPoints = append(dataPoints, md)
+		ch <- m
 	}
-	return dataPoints
 }
 
 // getAttrs parses the attribute.Set to two lists of matching Prometheus-style
 // keys and values. It sanitizes invalid characters and handles duplicate keys
 // (due to sanitization) by sorting and concatenating the values following the spec.
-func getAttrs(attrs attribute.Set) ([]string, []string) {
+func getAttrs(attrs attribute.Set, ks, vs [2]string, resourceKV keyVals) ([]string, []string) {
 	keysMap := make(map[string][]string)
 	itr := attrs.Iter()
 	for itr.Next() {
@@ -265,24 +329,30 @@ func getAttrs(attrs attribute.Set) ([]string, []string) {
 		})
 		values = append(values, strings.Join(vals, ";"))
 	}
+
+	if ks[0] != "" {
+		keys = append(keys, ks[:]...)
+		values = append(values, vs[:]...)
+	}
+
+	for idx := range resourceKV.keys {
+		keys = append(keys, resourceKV.keys[idx])
+		values = append(values, resourceKV.vals[idx])
+	}
+
 	return keys, values
 }
 
-func (c *collector) createInfoMetricData(name, description string, res *resource.Resource) *metricData {
-	if c.disableTargetInfo {
-		return nil
-	}
-
-	keys, values := getAttrs(*res.Set())
-
+func createInfoMetric(name, description string, res *resource.Resource) (prometheus.Metric, error) {
+	keys, values := getAttrs(*res.Set(), [2]string{}, [2]string{}, keyVals{})
 	desc := prometheus.NewDesc(name, description, keys, nil)
-	return &metricData{
-		name:            name,
-		description:     desc,
-		attributeValues: values,
-		valueType:       prometheus.GaugeValue,
-		value:           float64(1),
-	}
+	return prometheus.NewConstMetric(desc, prometheus.GaugeValue, float64(1), values...)
+}
+
+func createScopeInfoMetric(scope instrumentation.Scope) (prometheus.Metric, error) {
+	keys := scopeInfoKeys[:]
+	desc := prometheus.NewDesc(scopeInfoMetricName, scopeInfoDescription, keys, nil)
+	return prometheus.NewConstMetric(desc, prometheus.GaugeValue, float64(1), scope.Name, scope.Version)
 }
 
 func sanitizeRune(r rune) rune {
@@ -292,20 +362,59 @@ func sanitizeRune(r rune) rune {
 	return '_'
 }
 
-var unitSuffixes = map[unit.Unit]string{
-	unit.Dimensionless: "_ratio",
-	unit.Bytes:         "_bytes",
-	unit.Milliseconds:  "_milliseconds",
+var unitSuffixes = map[string]string{
+	// Time
+	"d":   "_days",
+	"h":   "_hours",
+	"min": "_minutes",
+	"s":   "_seconds",
+	"ms":  "_milliseconds",
+	"us":  "_microseconds",
+	"ns":  "_nanoseconds",
+
+	// Bytes
+	"By":   "_bytes",
+	"KiBy": "_kibibytes",
+	"MiBy": "_mebibytes",
+	"GiBy": "_gibibytes",
+	"TiBy": "_tibibytes",
+	"KBy":  "_kilobytes",
+	"MBy":  "_megabytes",
+	"GBy":  "_gigabytes",
+	"TBy":  "_terabytes",
+
+	// SI
+	"m": "_meters",
+	"V": "_volts",
+	"A": "_amperes",
+	"J": "_joules",
+	"W": "_watts",
+	"g": "_grams",
+
+	// Misc
+	"Cel": "_celsius",
+	"Hz":  "_hertz",
+	"1":   "_ratio",
+	"%":   "_percent",
 }
 
-// getName returns the sanitized name, including unit suffix.
-func (c *collector) getName(m metricdata.Metrics) string {
+// getName returns the sanitized name, prefixed with the namespace and suffixed with unit.
+func (c *collector) getName(m metricdata.Metrics, typ *dto.MetricType) string {
 	name := sanitizeName(m.Name)
-	if c.withoutUnits {
-		return name
+	addCounterSuffix := !c.withoutCounterSuffixes && *typ == dto.MetricType_COUNTER
+	if addCounterSuffix {
+		// Remove the _total suffix here, as we will re-add the total suffix
+		// later, and it needs to come after the unit suffix.
+		name = strings.TrimSuffix(name, counterSuffix)
 	}
-	if suffix, ok := unitSuffixes[m.Unit]; ok {
+	if c.namespace != "" {
+		name = c.namespace + name
+	}
+	if suffix, ok := unitSuffixes[m.Unit]; ok && !c.withoutUnits && !strings.HasSuffix(name, suffix) {
 		name += suffix
+	}
+	if addCounterSuffix {
+		name += counterSuffix
 	}
 	return name
 }
@@ -334,12 +443,12 @@ func sanitizeName(n string) string {
 		if i == 0 && c >= '0' && c <= '9' {
 			// Prefix leading number with replacement character.
 			b.Grow(len(n) + 1)
-			b.WriteByte(byte(replacement))
+			_ = b.WriteByte(byte(replacement))
 			break
 		}
 		b.Grow(len(n))
-		b.WriteString(n[:i])
-		b.WriteByte(byte(replacement))
+		_, _ = b.WriteString(n[:i])
+		_ = b.WriteByte(byte(replacement))
 		width := utf8.RuneLen(c)
 		n = n[i+width:]
 		break
@@ -354,11 +463,102 @@ func sanitizeName(n string) string {
 		// Due to inlining, it is more performant to invoke WriteByte rather then
 		// WriteRune.
 		if valid(1, c) { // We are guaranteed to not be at the start.
-			b.WriteByte(byte(c))
+			_ = b.WriteByte(byte(c))
 		} else {
-			b.WriteByte(byte(replacement))
+			_ = b.WriteByte(byte(replacement))
 		}
 	}
 
 	return b.String()
+}
+
+func (c *collector) metricType(m metricdata.Metrics) *dto.MetricType {
+	switch v := m.Data.(type) {
+	case metricdata.Histogram[int64], metricdata.Histogram[float64]:
+		return dto.MetricType_HISTOGRAM.Enum()
+	case metricdata.Sum[float64]:
+		if v.IsMonotonic {
+			return dto.MetricType_COUNTER.Enum()
+		}
+		return dto.MetricType_GAUGE.Enum()
+	case metricdata.Sum[int64]:
+		if v.IsMonotonic {
+			return dto.MetricType_COUNTER.Enum()
+		}
+		return dto.MetricType_GAUGE.Enum()
+	case metricdata.Gauge[int64], metricdata.Gauge[float64]:
+		return dto.MetricType_GAUGE.Enum()
+	}
+	return nil
+}
+
+func (c *collector) createResourceAttributes(res *resource.Resource) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	resourceAttrs, _ := res.Set().Filter(c.resourceAttributesFilter)
+	resourceKeys, resourceValues := getAttrs(resourceAttrs, [2]string{}, [2]string{}, keyVals{})
+	c.resourceKeyVals = keyVals{keys: resourceKeys, vals: resourceValues}
+}
+
+func (c *collector) scopeInfo(scope instrumentation.Scope) (prometheus.Metric, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	scopeInfo, ok := c.scopeInfos[scope]
+	if ok {
+		return scopeInfo, nil
+	}
+
+	if _, ok := c.scopeInfosInvalid[scope]; ok {
+		return nil, errScopeInvalid
+	}
+
+	scopeInfo, err := createScopeInfoMetric(scope)
+	if err != nil {
+		c.scopeInfosInvalid[scope] = struct{}{}
+		return nil, fmt.Errorf("cannot create scope info metric: %w", err)
+	}
+
+	c.scopeInfos[scope] = scopeInfo
+
+	return scopeInfo, nil
+}
+
+func (c *collector) validateMetrics(name, description string, metricType *dto.MetricType) (drop bool, help string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	emf, exist := c.metricFamilies[name]
+
+	if !exist {
+		c.metricFamilies[name] = &dto.MetricFamily{
+			Name: proto.String(name),
+			Help: proto.String(description),
+			Type: metricType,
+		}
+		return false, ""
+	}
+
+	if emf.GetType() != *metricType {
+		global.Error(
+			errors.New("instrument type conflict"),
+			"Using existing type definition.",
+			"instrument", name,
+			"existing", emf.GetType(),
+			"dropped", *metricType,
+		)
+		return true, ""
+	}
+	if emf.GetHelp() != description {
+		global.Info(
+			"Instrument description conflict, using existing",
+			"instrument", name,
+			"existing", emf.GetHelp(),
+			"dropped", description,
+		)
+		return false, emf.GetHelp()
+	}
+
+	return false, ""
 }

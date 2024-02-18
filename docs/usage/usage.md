@@ -2,9 +2,9 @@
 
 ```shell
 
-cat <<EOF > kcluster1.yaml
-apiVersion: koffloader.koffloader.io/v1
-kind: kcluster
+cat <<EOF > mybook1.yaml
+apiVersion: rocktemplate.spidernet.io/v1
+kind: Mybook
 metadata:
   name: test1
 spec:
@@ -12,12 +12,12 @@ spec:
   subnet: "1.0.0.0/8"
 EOF
 
-kubectl apply -f kcluster1.yaml
+kubectl apply -f mybook1.yaml
 
 
-cat <<EOF > kcluster2.yaml
-apiVersion: koffloader.koffloader.io/v1
-kind: kcluster
+cat <<EOF > mybook2.yaml
+apiVersion: rocktemplate.spidernet.io/v1
+kind: Mybook
 metadata:
   name: test2
 spec:
@@ -25,7 +25,7 @@ spec:
   subnet: "2.0.0.0/8"
 EOF
 
-kubectl apply -f kcluster2.yaml
+kubectl apply -f mybook2.yaml
 
 
 ```

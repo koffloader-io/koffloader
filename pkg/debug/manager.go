@@ -1,4 +1,4 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package debug
@@ -6,10 +6,11 @@ package debug
 import (
 	"fmt"
 	"github.com/google/gops/agent"
-	"github.com/pyroscope-io/client/pyroscope"
+	pyroscope "github.com/grafana/pyroscope-go"
 	"go.uber.org/zap"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 type DebugManager interface {
@@ -40,6 +41,10 @@ func (s *debugManager) RunPyroscope(serverAddress string, localHostName string) 
 	// push mode ,  push to pyroscope server
 	s.logger.Sugar().Infof("%v pyroscope works in push mode, server %s ", localHostName, serverAddress)
 
+	// These 2 lines are only required if you're using mutex or block profiling
+	runtime.SetMutexProfileFraction(5)
+	runtime.SetBlockProfileRate(5)
+
 	_, e := pyroscope.Start(pyroscope.Config{
 		ApplicationName: filepath.Base(os.Args[0]),
 		ServerAddress:   serverAddress,
@@ -49,10 +54,15 @@ func (s *debugManager) RunPyroscope(serverAddress string, localHostName string) 
 		Tags:   map[string]string{"node": localHostName},
 		ProfileTypes: []pyroscope.ProfileType{
 			pyroscope.ProfileCPU,
-			pyroscope.ProfileAllocObjects,
-			pyroscope.ProfileAllocSpace,
 			pyroscope.ProfileInuseObjects,
+			pyroscope.ProfileAllocObjects,
 			pyroscope.ProfileInuseSpace,
+			pyroscope.ProfileAllocSpace,
+			pyroscope.ProfileGoroutines,
+			pyroscope.ProfileMutexCount,
+			pyroscope.ProfileMutexDuration,
+			pyroscope.ProfileBlockCount,
+			pyroscope.ProfileBlockDuration,
 		},
 	})
 	if e != nil {

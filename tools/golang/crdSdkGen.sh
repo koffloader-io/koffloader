@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2024 Authors of koffloader-io
+# Copyright 2022 Authors of spidernet-io
 # SPDX-License-Identifier: Apache-2.0
 
 # generate skd for the crd of client,informer,lister, to pkg/k8s/client
@@ -13,7 +13,7 @@ set -o pipefail
 APIS_PKG="pkg/k8s/apis"
 OUTPUT_PKG="pkg/k8s/client"
 # ====modify====
-GROUPS_WITH_VERSIONS="koffloader.koffloader.io:v1"
+GROUPS_WITH_VERSIONS="rocktemplate.spidernet.io:v1"
 
 #===================
 

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: 'github project, like "koffloader-io/koffloader" '
+        description: 'github project, like "spidernet-io/rocktemplate" '
         required: false
 
 permissions: write-all
@@ -16,7 +16,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.22.0
+          go-version: 1.21.7
 
       - name: run
         run: |

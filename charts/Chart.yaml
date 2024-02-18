@@ -1,20 +1,20 @@
 apiVersion: v2
-name: koffloader
-home: "https://github.com/koffloader-io/koffloader"
+name: rocktemplate
+home: "https://github.com/spidernet-io/rocktemplate"
 # application or library
 type: application
 # no need to modify this version , CI will auto update it with /VERSION
-version: 0.1.2
+version: 0.1.0
 # This field is informational, and has no impact on chart version calculations .
 # Leaving it unquoted can lead to parsing issues in some cases
 # no need to modify this version , CI will auto update it with /VERSION
-appVersion: "0.1.2"
+appVersion: "0.1.0"
 kubeVersion: ">= 1.16.0-0"
-description: koffloader
+description: rocktemplate
 sources:
-  - "https://github.com/koffloader-io/koffloader"
+  - "https://github.com/spidernet-io/rocktemplate"
 keywords:
-  - koffloader
+  - rocktemplate
 maintainers:
-  - name: koffloader-io
-    url: https://github.com/koffloader-io
+  - name: spidernet-io
+    url: https://github.com/spidernet-io

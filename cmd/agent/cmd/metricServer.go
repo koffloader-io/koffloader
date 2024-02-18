@@ -1,21 +1,22 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
-	pkgmetric "github.com/koffloader-io/koffloader/pkg/metrics"
-	"github.com/koffloader-io/koffloader/pkg/types"
-	"go.opentelemetry.io/otel/metric/instrument/syncfloat64"
+	pkgmetric "github.com/spidernet-io/rocktemplate/pkg/metrics"
+	"github.com/spidernet-io/rocktemplate/pkg/types"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+
+	api "go.opentelemetry.io/otel/metric"
+
 	"go.opentelemetry.io/otel/sdk/instrumentation"
-	"go.opentelemetry.io/otel/sdk/metric/aggregation"
-	"go.opentelemetry.io/otel/sdk/metric/view"
 )
 
 var (
-	MetricCounterRequest    syncfloat64.Counter
-	MetricGaugeEndpoint     syncfloat64.UpDownCounter
-	MetricHistogramDuration syncfloat64.Histogram
+	MetricCounterRequest    api.Int64Counter
+	MetricGaugeEndpoint     api.Int64UpDownCounter
+	MetricHistogramDuration api.Float64Histogram
 )
 
 var metricMapping = []pkgmetric.MetricMappingType{
@@ -30,20 +31,12 @@ func RunMetricsServer(meterName string) {
 	logger := rootLogger.Named("metric")
 
 	// View to customize histogram buckets
-	customBucketsView, err := view.New(
-		// MatchInstrumentName will match an instrument based on the its name.
-		// This will accept wildcards of * for zero or more characters, and ? for
-		// exactly one character. A name of "*" (default) will match all instruments.
-		view.MatchInstrumentName("*duration*"),
-		view.MatchInstrumentationScope(instrumentation.Scope{Name: meterName}),
-		// With* to modify instruments
-		view.WithSetAggregation(aggregation.ExplicitBucketHistogram{
-			Boundaries: []float64{1, 10, 20, 50},
-		}),
-	)
-	if err != nil {
-		logger.Sugar().Fatalf("failed to generate view, reason=%v", err)
-	}
+	customBucketsView := sdkmetric.NewView(sdkmetric.Instrument{
+		Name:  "*duration*",
+		Scope: instrumentation.Scope{Name: meterName},
+	}, sdkmetric.Stream{Aggregation: sdkmetric.AggregationExplicitBucketHistogram{
+		Boundaries: []float64{1, 10, 20, 50},
+	}})
 
 	// globalMeter=pkgmetric.NewMetricsServer(meterName, globalConfig.MetricPort, metricMapping, customBucketsView, logger)
 	pkgmetric.RunMetricsServer(types.AgentConfig.EnableMetric, meterName, types.AgentConfig.MetricPort, metricMapping, customBucketsView, logger)

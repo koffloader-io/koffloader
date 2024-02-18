@@ -9,8 +9,8 @@ global:
   imageTagOverride: ""
 
   ## @param global.name instance name
-  ## default koffloader
-  name: "koffloader"
+  ## default rocktemplate
+  name: "rocktemplate"
 
   ## @param global.clusterDnsDomain cluster dns domain
   clusterDnsDomain: "cluster.local"
@@ -24,7 +24,7 @@ global:
   #  labele: v2
 
   ## @param global.configName the configmap name
-  configName: "koffloader"
+  configName: "rocktemplate"
 
 ## @section feature parameters
 feature:
@@ -34,94 +34,94 @@ feature:
   ## @param feature.enableIPv6 enable ipv6
   enableIPv6: false
 
-## @section koffloaderAgent parameters
+## @section rocktemplateAgent parameters
 ##
-koffloaderAgent:
-  ## @param koffloaderAgent.name the koffloaderAgent name
-  name: "koffloader-agent"
+rocktemplateAgent:
+  ## @param rocktemplateAgent.name the rocktemplateAgent name
+  name: "rocktemplate-agent"
 
-  ## @param koffloaderAgent.cmdBinName the binary name of koffloaderAgent
+  ## @param rocktemplateAgent.cmdBinName the binary name of rocktemplateAgent
   cmdBinName: "/usr/bin/agent"
 
-  ## @param koffloaderAgent.hostnetwork enable hostnetwork mode of koffloaderAgent pod
+  ## @param rocktemplateAgent.hostnetwork enable hostnetwork mode of rocktemplateAgent pod
   hostnetwork: true
 
   image:
-    ## @param koffloaderAgent.image.registry the image registry of koffloaderAgent
+    ## @param rocktemplateAgent.image.registry the image registry of rocktemplateAgent
     registry: ghcr.io
 
-    ## @param koffloaderAgent.image.repository the image repository of koffloaderAgent
-    repository: koffloader-io/koffloader-agent
+    ## @param rocktemplateAgent.image.repository the image repository of rocktemplateAgent
+    repository: spidernet-io/rocktemplate-agent
 
-    ## @param koffloaderAgent.image.pullPolicy the image pullPolicy of koffloaderAgent
+    ## @param rocktemplateAgent.image.pullPolicy the image pullPolicy of rocktemplateAgent
     pullPolicy: IfNotPresent
 
-    ## @param koffloaderAgent.image.digest the image digest of koffloaderAgent, which takes preference over tag
+    ## @param rocktemplateAgent.image.digest the image digest of rocktemplateAgent, which takes preference over tag
     digest: ""
 
-    ## @param koffloaderAgent.image.tag the image tag of koffloaderAgent, overrides the image tag whose default is the chart appVersion.
+    ## @param rocktemplateAgent.image.tag the image tag of rocktemplateAgent, overrides the image tag whose default is the chart appVersion.
     tag: ""
 
-    ## @param koffloaderAgent.image.imagePullSecrets the image imagePullSecrets of koffloaderAgent
+    ## @param rocktemplateAgent.image.imagePullSecrets the image imagePullSecrets of rocktemplateAgent
     imagePullSecrets: []
     # - name: "image-pull-secret"
 
-  ## @skip koffloaderAgent.nodeSelector.kubernetes.io/os
+  ## @skip rocktemplateAgent.nodeSelector.kubernetes.io/os
   nodeSelector:
     kubernetes.io/os: linux
 
   serviceAccount:
-    ## @param koffloaderAgent.serviceAccount.create create the service account for the koffloaderAgent
+    ## @param rocktemplateAgent.serviceAccount.create create the service account for the rocktemplateAgent
     create: true
-    ## @param koffloaderAgent.serviceAccount.annotations the annotations of koffloaderAgent service account
+    ## @param rocktemplateAgent.serviceAccount.annotations the annotations of rocktemplateAgent service account
     annotations: {}
 
-  ## @skip koffloaderAgent.updateStrategy.rollingUpdate.maxUnavailable
-  ## @skip koffloaderAgent.updateStrategy.type
+  ## @skip rocktemplateAgent.updateStrategy.rollingUpdate.maxUnavailable
+  ## @skip rocktemplateAgent.updateStrategy.type
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 2
     type: RollingUpdate
 
   service:
-    ## @param koffloaderAgent.service.annotations the annotations for koffloaderAgent service
+    ## @param rocktemplateAgent.service.annotations the annotations for rocktemplateAgent service
     annotations: {}
-    ## @param koffloaderAgent.service.type the type for koffloaderAgent service
+    ## @param rocktemplateAgent.service.type the type for rocktemplateAgent service
     type: ClusterIP
 
-  ## @skip koffloaderAgent.tolerations
+  ## @skip rocktemplateAgent.tolerations
   tolerations:
     - operator: Exists
 
-  ## @param koffloaderAgent.priorityClassName the priority Class Name for koffloaderAgent
+  ## @param rocktemplateAgent.priorityClassName the priority Class Name for rocktemplateAgent
   priorityClassName: "system-node-critical"
 
-  ## @param koffloaderAgent.affinity the affinity of koffloaderAgent
+  ## @param rocktemplateAgent.affinity the affinity of rocktemplateAgent
   affinity: {}
 
-  ## @param koffloaderAgent.extraArgs the additional arguments of koffloaderAgent container
+  ## @param rocktemplateAgent.extraArgs the additional arguments of rocktemplateAgent container
   extraArgs: []
 
-  ## @param koffloaderAgent.extraEnv the additional environment variables of koffloaderAgent container
+  ## @param rocktemplateAgent.extraEnv the additional environment variables of rocktemplateAgent container
   extraEnv: []
 
-  ## @param koffloaderAgent.extraVolumes the additional volumes of koffloaderAgent container
+  ## @param rocktemplateAgent.extraVolumes the additional volumes of rocktemplateAgent container
   extraVolumes: []
 
-  ## @param koffloaderAgent.extraVolumeMounts the additional hostPath mounts of koffloaderAgent container
+  ## @param rocktemplateAgent.extraVolumeMounts the additional hostPath mounts of rocktemplateAgent container
   extraVolumeMounts: []
 
-  ## @param koffloaderAgent.podAnnotations the additional annotations of koffloaderAgent pod
+  ## @param rocktemplateAgent.podAnnotations the additional annotations of rocktemplateAgent pod
   podAnnotations: {}
 
-  ## @param koffloaderAgent.podLabels the additional label of koffloaderAgent pod
+  ## @param rocktemplateAgent.podLabels the additional label of rocktemplateAgent pod
   podLabels: {}
 
   resources:
-    ## @param koffloaderAgent.resources.limits.cpu the cpu limit of koffloaderAgent pod
-    ## @param koffloaderAgent.resources.limits.memory the memory limit of koffloaderAgent pod
-    ## @param koffloaderAgent.resources.requests.cpu the cpu requests of koffloaderAgent pod
-    ## @param koffloaderAgent.resources.requests.memory the memory requests of koffloaderAgent pod
+    ## @param rocktemplateAgent.resources.limits.cpu the cpu limit of rocktemplateAgent pod
+    ## @param rocktemplateAgent.resources.limits.memory the memory limit of rocktemplateAgent pod
+    ## @param rocktemplateAgent.resources.requests.cpu the cpu requests of rocktemplateAgent pod
+    ## @param rocktemplateAgent.resources.requests.memory the memory requests of rocktemplateAgent pod
     limits:
       cpu: 1000m
       memory: 1024Mi
@@ -129,177 +129,177 @@ koffloaderAgent:
       cpu: 100m
       memory: 128Mi
 
-  ## @param koffloaderAgent.securityContext the security Context of koffloaderAgent pod
+  ## @param rocktemplateAgent.securityContext the security Context of rocktemplateAgent pod
   securityContext: {}
   # runAsUser: 0
 
   httpServer:
-    ## @param koffloaderAgent.httpServer.port the http Port for koffloaderAgent, for health checking
+    ## @param rocktemplateAgent.httpServer.port the http Port for rocktemplateAgent, for health checking
     port: 5710
 
     startupProbe:
-      ## @param koffloaderAgent.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for rocktemplateAgent health checking
       failureThreshold: 60
-      ## @param koffloaderAgent.httpServer.startupProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.startupProbe.periodSeconds the period seconds of startup probe for rocktemplateAgent health checking
       periodSeconds: 2
 
     livenessProbe:
-      ## @param koffloaderAgent.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for rocktemplateAgent health checking
       failureThreshold: 6
-      ## @param koffloaderAgent.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for rocktemplateAgent health checking
       periodSeconds: 10
 
     readinessProbe:
-      ## @param koffloaderAgent.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for rocktemplateAgent health checking
       failureThreshold: 3
-      ## @param koffloaderAgent.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      ## @param rocktemplateAgent.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for rocktemplateAgent health checking
       periodSeconds: 10
 
   prometheus:
-    ## @param koffloaderAgent.prometheus.enabled enable template agent to collect metrics
+    ## @param rocktemplateAgent.prometheus.enabled enable template agent to collect metrics
     enabled: false
 
-    ## @param koffloaderAgent.prometheus.port the metrics port of template agent
+    ## @param rocktemplateAgent.prometheus.port the metrics port of template agent
     port: 5711
 
     serviceMonitor:
-      ## @param koffloaderAgent.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateAgent.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderAgent.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
+      ## @param rocktemplateAgent.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderAgent.prometheus.serviceMonitor.annotations the additional annotations of koffloaderAgent serviceMonitor
+      ## @param rocktemplateAgent.prometheus.serviceMonitor.annotations the additional annotations of rocktemplateAgent serviceMonitor
       annotations: {}
 
-      ## @param koffloaderAgent.prometheus.serviceMonitor.labels the additional label of koffloaderAgent serviceMonitor
+      ## @param rocktemplateAgent.prometheus.serviceMonitor.labels the additional label of rocktemplateAgent serviceMonitor
       labels: {}
 
     prometheusRule:
-      ## @param koffloaderAgent.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateAgent.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderAgent.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
+      ## @param rocktemplateAgent.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderAgent.prometheus.prometheusRule.annotations the additional annotations of koffloaderAgent prometheusRule
+      ## @param rocktemplateAgent.prometheus.prometheusRule.annotations the additional annotations of rocktemplateAgent prometheusRule
       annotations: {}
 
-      ## @param koffloaderAgent.prometheus.prometheusRule.labels the additional label of koffloaderAgent prometheusRule
+      ## @param rocktemplateAgent.prometheus.prometheusRule.labels the additional label of rocktemplateAgent prometheusRule
       labels: {}
 
     grafanaDashboard:
-      ## @param koffloaderAgent.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateAgent.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderAgent.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
+      ## @param rocktemplateAgent.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderAgent.prometheus.grafanaDashboard.annotations the additional annotations of koffloaderAgent grafanaDashboard
+      ## @param rocktemplateAgent.prometheus.grafanaDashboard.annotations the additional annotations of rocktemplateAgent grafanaDashboard
       annotations: {}
 
-      ## @param koffloaderAgent.prometheus.grafanaDashboard.labels the additional label of koffloaderAgent grafanaDashboard
+      ## @param rocktemplateAgent.prometheus.grafanaDashboard.labels the additional label of rocktemplateAgent grafanaDashboard
       labels: {}
 
   debug:
-    ## @param koffloaderAgent.debug.logLevel the log level of template agent [debug, info, warn, error, fatal, panic]
+    ## @param rocktemplateAgent.debug.logLevel the log level of template agent [debug, info, warn, error, fatal, panic]
     logLevel: "info"
-    ## @param koffloaderAgent.debug.gopsPort the gops port of template agent
+    ## @param rocktemplateAgent.debug.gopsPort the gops port of template agent
     gopsPort: 5712
 
-## @section koffloaderController parameters
+## @section rocktemplateController parameters
 ##
-koffloaderController:
-  ## @param koffloaderController.name the koffloaderController name
-  name: "koffloader-controller"
+rocktemplateController:
+  ## @param rocktemplateController.name the rocktemplateController name
+  name: "rocktemplate-controller"
 
-  ## @param koffloaderController.replicas the replicas number of koffloaderController pod
+  ## @param rocktemplateController.replicas the replicas number of rocktemplateController pod
   replicas: 1
 
-  ## @param koffloaderController.binName the binName name of koffloaderController
+  ## @param rocktemplateController.binName the binName name of rocktemplateController
   cmdBinName: "/usr/bin/controller"
 
-  ## @param koffloaderController.hostnetwork enable hostnetwork mode of koffloaderController pod. Notice, if no CNI available before template installation, must enable this
+  ## @param rocktemplateController.hostnetwork enable hostnetwork mode of rocktemplateController pod. Notice, if no CNI available before template installation, must enable this
   hostnetwork: false
 
   image:
-    ## @param koffloaderController.image.registry the image registry of koffloaderController
+    ## @param rocktemplateController.image.registry the image registry of rocktemplateController
     registry: ghcr.io
 
-    ## @param koffloaderController.image.repository the image repository of koffloaderController
-    repository: koffloader-io/koffloader-controller
+    ## @param rocktemplateController.image.repository the image repository of rocktemplateController
+    repository: spidernet-io/rocktemplate-controller
 
-    ## @param koffloaderController.image.pullPolicy the image pullPolicy of koffloaderController
+    ## @param rocktemplateController.image.pullPolicy the image pullPolicy of rocktemplateController
     pullPolicy: IfNotPresent
 
-    ## @param koffloaderController.image.digest the image digest of koffloaderController, which takes preference over tag
+    ## @param rocktemplateController.image.digest the image digest of rocktemplateController, which takes preference over tag
     digest: ""
 
-    ## @param koffloaderController.image.tag the image tag of koffloaderController, overrides the image tag whose default is the chart appVersion.
+    ## @param rocktemplateController.image.tag the image tag of rocktemplateController, overrides the image tag whose default is the chart appVersion.
     tag: ""
 
-    ## @param koffloaderController.image.imagePullSecrets the image imagePullSecrets of koffloaderController
+    ## @param rocktemplateController.image.imagePullSecrets the image imagePullSecrets of rocktemplateController
     imagePullSecrets: []
     # - name: "image-pull-secret"
 
-  ## @skip koffloaderController.nodeSelector.kubernetes.io/os
+  ## @skip rocktemplateController.nodeSelector.kubernetes.io/os
   nodeSelector:
     kubernetes.io/os: linux
 
   serviceAccount:
-    ## @param koffloaderController.serviceAccount.create create the service account for the koffloaderController
+    ## @param rocktemplateController.serviceAccount.create create the service account for the rocktemplateController
     create: true
-    ## @param koffloaderController.serviceAccount.annotations the annotations of koffloaderController service account
+    ## @param rocktemplateController.serviceAccount.annotations the annotations of rocktemplateController service account
     annotations: {}
 
   service:
-    ## @param koffloaderController.service.annotations the annotations for koffloaderController service
+    ## @param rocktemplateController.service.annotations the annotations for rocktemplateController service
     annotations: {}
-    ## @param koffloaderController.service.type the type for koffloaderController service
+    ## @param rocktemplateController.service.type the type for rocktemplateController service
     type: ClusterIP
 
-  ## @skip koffloaderController.tolerations
+  ## @skip rocktemplateController.tolerations
   tolerations:
     - operator: Exists
 
-  ## @param koffloaderController.priorityClassName the priority Class Name for koffloaderController
+  ## @param rocktemplateController.priorityClassName the priority Class Name for rocktemplateController
   priorityClassName: "system-node-critical"
 
-  ## @param koffloaderController.affinity the affinity of koffloaderController
+  ## @param rocktemplateController.affinity the affinity of rocktemplateController
   affinity: {}
 
-  ## @param koffloaderController.extraArgs the additional arguments of koffloaderController container
+  ## @param rocktemplateController.extraArgs the additional arguments of rocktemplateController container
   extraArgs: []
 
-  ## @param koffloaderController.extraEnv the additional environment variables of koffloaderController container
+  ## @param rocktemplateController.extraEnv the additional environment variables of rocktemplateController container
   extraEnv: []
 
-  ## @param koffloaderController.extraVolumes the additional volumes of koffloaderController container
+  ## @param rocktemplateController.extraVolumes the additional volumes of rocktemplateController container
   extraVolumes: []
     # - name: test-val
   #   mountPath: /host/tmp
 
-  ## @param koffloaderController.extraVolumeMounts the additional hostPath mounts of koffloaderController container
+  ## @param rocktemplateController.extraVolumeMounts the additional hostPath mounts of rocktemplateController container
   extraVolumeMounts: []
     # - name: test-val
   #   mountPath: /tmp
 
-  ## @param koffloaderController.podAnnotations the additional annotations of koffloaderController pod
+  ## @param rocktemplateController.podAnnotations the additional annotations of rocktemplateController pod
   podAnnotations: {}
   # test: 100
 
-  ## @param koffloaderController.podLabels the additional label of koffloaderController pod
+  ## @param rocktemplateController.podLabels the additional label of rocktemplateController pod
   podLabels: {}
 
-  ## @param koffloaderController.securityContext the security Context of koffloaderController pod
+  ## @param rocktemplateController.securityContext the security Context of rocktemplateController pod
   securityContext: {}
   # runAsUser: 0
 
   resources:
-    ## @param koffloaderController.resources.limits.cpu the cpu limit of koffloaderController pod
-    ## @param koffloaderController.resources.limits.memory the memory limit of koffloaderController pod
-    ## @param koffloaderController.resources.requests.cpu the cpu requests of koffloaderController pod
-    ## @param koffloaderController.resources.requests.memory the memory requests of koffloaderController pod
+    ## @param rocktemplateController.resources.limits.cpu the cpu limit of rocktemplateController pod
+    ## @param rocktemplateController.resources.limits.memory the memory limit of rocktemplateController pod
+    ## @param rocktemplateController.resources.requests.cpu the cpu requests of rocktemplateController pod
+    ## @param rocktemplateController.resources.requests.memory the memory requests of rocktemplateController pod
     limits:
       cpu: 500m
       memory: 1024Mi
@@ -308,139 +308,139 @@ koffloaderController:
       memory: 128Mi
 
   podDisruptionBudget:
-    ## @param koffloaderController.podDisruptionBudget.enabled enable podDisruptionBudget for koffloaderController pod
+    ## @param rocktemplateController.podDisruptionBudget.enabled enable podDisruptionBudget for rocktemplateController pod
     enabled: false
 
-    ## @param koffloaderController.podDisruptionBudget.minAvailable minimum number/percentage of pods that should remain scheduled.
+    ## @param rocktemplateController.podDisruptionBudget.minAvailable minimum number/percentage of pods that should remain scheduled.
     minAvailable: 1
 
   httpServer:
-    ## @param koffloaderController.port the http Port for koffloaderController, for health checking and http service
+    ## @param rocktemplateController.port the http Port for rocktemplateController, for health checking and http service
     port: 5720
 
     startupProbe:
-      ## @param koffloaderController.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for rocktemplateController health checking
       failureThreshold: 30
 
-      ## @param koffloaderController.httpServer.startupProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.startupProbe.periodSeconds the period seconds of startup probe for rocktemplateController health checking
       periodSeconds: 2
 
     livenessProbe:
-      ## @param koffloaderController.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for rocktemplateController health checking
       failureThreshold: 6
 
-      ## @param koffloaderController.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for rocktemplateController health checking
       periodSeconds: 10
 
     readinessProbe:
-      ## @param koffloaderController.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for rocktemplateController health checking
       failureThreshold: 3
 
-      ## @param koffloaderController.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      ## @param rocktemplateController.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for rocktemplateController health checking
       periodSeconds: 10
 
-  ## @param koffloaderController.webhookPort the http port for koffloaderController webhook
+  ## @param rocktemplateController.webhookPort the http port for rocktemplateController webhook
   webhookPort: 5722
 
   prometheus:
-    ## @param koffloaderController.prometheus.enabled enable template Controller to collect metrics
+    ## @param rocktemplateController.prometheus.enabled enable template Controller to collect metrics
     enabled: false
 
-    ## @param koffloaderController.prometheus.port the metrics port of template Controller
+    ## @param rocktemplateController.prometheus.port the metrics port of template Controller
     port: 5721
 
     serviceMonitor:
-      ## @param koffloaderController.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateController.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderController.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
+      ## @param rocktemplateController.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderController.prometheus.serviceMonitor.annotations the additional annotations of koffloaderController serviceMonitor
+      ## @param rocktemplateController.prometheus.serviceMonitor.annotations the additional annotations of rocktemplateController serviceMonitor
       annotations: {}
 
-      ## @param koffloaderController.prometheus.serviceMonitor.labels the additional label of koffloaderController serviceMonitor
+      ## @param rocktemplateController.prometheus.serviceMonitor.labels the additional label of rocktemplateController serviceMonitor
       labels: {}
 
     prometheusRule:
-      ## @param koffloaderController.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateController.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderController.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
+      ## @param rocktemplateController.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderController.prometheus.prometheusRule.annotations the additional annotations of koffloaderController prometheusRule
+      ## @param rocktemplateController.prometheus.prometheusRule.annotations the additional annotations of rocktemplateController prometheusRule
       annotations: {}
 
-      ## @param koffloaderController.prometheus.prometheusRule.labels the additional label of koffloaderController prometheusRule
+      ## @param rocktemplateController.prometheus.prometheusRule.labels the additional label of rocktemplateController prometheusRule
       labels: {}
 
     grafanaDashboard:
-      ## @param koffloaderController.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
+      ## @param rocktemplateController.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
       install: false
 
-      ## @param koffloaderController.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
+      ## @param rocktemplateController.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
       namespace: ""
 
-      ## @param koffloaderController.prometheus.grafanaDashboard.annotations the additional annotations of koffloaderController grafanaDashboard
+      ## @param rocktemplateController.prometheus.grafanaDashboard.annotations the additional annotations of rocktemplateController grafanaDashboard
       annotations: {}
 
-      ## @param koffloaderController.prometheus.grafanaDashboard.labels the additional label of koffloaderController grafanaDashboard
+      ## @param rocktemplateController.prometheus.grafanaDashboard.labels the additional label of rocktemplateController grafanaDashboard
       labels: {}
 
   debug:
-    ## @param koffloaderController.debug.logLevel the log level of template Controller [debug, info, warn, error, fatal, panic]
+    ## @param rocktemplateController.debug.logLevel the log level of template Controller [debug, info, warn, error, fatal, panic]
     logLevel: "info"
 
-    ## @param koffloaderController.debug.gopsPort the gops port of template Controller
+    ## @param rocktemplateController.debug.gopsPort the gops port of template Controller
     gopsPort: 5724
 
   ## TLS configuration for webhook
   tls:
-    ## @param koffloaderController.tls.method the method for generating TLS certificates. [ provided , certmanager , auto]
+    ## @param rocktemplateController.tls.method the method for generating TLS certificates. [ provided , certmanager , auto]
     ## - provided:     provide all certificates by helm options
     ## - certmanager:  This method use cert-manager to generate & rotate certificates.
     ## - auto:         Auto generate cert.
     method: auto
 
-    ## @param koffloaderController.tls.secretName the secret name for storing TLS certificates
+    ## @param rocktemplateController.tls.secretName the secret name for storing TLS certificates
     secretName: "template-controller-server-certs"
 
     ## for certmanager method
     certmanager:
-      ## @param koffloaderController.tls.certmanager.certValidityDuration generated certificates validity duration in days for 'certmanager' method
+      ## @param rocktemplateController.tls.certmanager.certValidityDuration generated certificates validity duration in days for 'certmanager' method
       certValidityDuration: 365
 
-      ## @param koffloaderController.tls.certmanager.issuerName issuer name of cert manager 'certmanager'. If not specified, a CA issuer will be created.
+      ## @param rocktemplateController.tls.certmanager.issuerName issuer name of cert manager 'certmanager'. If not specified, a CA issuer will be created.
       issuerName: ""
 
-      ## @param koffloaderController.tls.certmanager.extraDnsNames extra DNS names added to certificate when it's auto generated
+      ## @param rocktemplateController.tls.certmanager.extraDnsNames extra DNS names added to certificate when it's auto generated
       extraDnsNames: []
 
-      ## @param koffloaderController.tls.certmanager.extraIPAddresses extra IP addresses added to certificate when it's auto generated
+      ## @param rocktemplateController.tls.certmanager.extraIPAddresses extra IP addresses added to certificate when it's auto generated
       extraIPAddresses: []
 
     ## for provided method
     provided:
-      ## @param koffloaderController.tls.provided.tlsCert encoded tls certificate for provided method
-      ## @param koffloaderController.tls.provided.tlsKey encoded tls key for provided method
-      ## @param koffloaderController.tls.provided.tlsCa encoded tls CA for provided method
+      ## @param rocktemplateController.tls.provided.tlsCert encoded tls certificate for provided method
+      ## @param rocktemplateController.tls.provided.tlsKey encoded tls key for provided method
+      ## @param rocktemplateController.tls.provided.tlsCa encoded tls CA for provided method
       tlsCert: ""
       tlsKey: ""
       tlsCa: ""
 
     ## for auto method
     auto:
-      ## @param koffloaderController.tls.auto.caExpiration ca expiration for auto method
+      ## @param rocktemplateController.tls.auto.caExpiration ca expiration for auto method
       # in day , default 200 years
       caExpiration: '73000'
 
-      ## @param koffloaderController.tls.auto.certExpiration server cert expiration for auto method
+      ## @param rocktemplateController.tls.auto.certExpiration server cert expiration for auto method
       # in day, default 200 years
       certExpiration: '73000'
 
-      ## @param koffloaderController.tls.auto.extraIpAddresses extra IP addresses of server certificate for auto method
+      ## @param rocktemplateController.tls.auto.extraIpAddresses extra IP addresses of server certificate for auto method
       extraIpAddresses: []
 
-      ## @param koffloaderController.tls.auto.extraDnsNames extra DNS names of server cert for auto method
+      ## @param rocktemplateController.tls.auto.extraDnsNames extra DNS names of server cert for auto method
       extraDnsNames: []

@@ -20,8 +20,8 @@ echo "$CURRENT_FILENAME : E2E_KUBECONFIG $E2E_KUBECONFIG "
 # ====modify====
 COMPONENT_GOROUTINE_MAX=300
 COMPONENT_PS_PROCESS_MAX=50
-CONTROLLER_LABEL="app.kubernetes.io/component=koffloader-controller"
-AGENT_LABEL="app.kubernetes.io/component=koffloader-agent"
+CONTROLLER_LABEL="app.kubernetes.io/component=rocktemplate-controller"
+AGENT_LABEL="app.kubernetes.io/component=rocktemplate-agent"
 
 
 CONTROLLER_POD_LIST=$( kubectl get pods --no-headers --kubeconfig ${E2E_KUBECONFIG}  --namespace ${COMPONENT_NAMESPACE} --selector ${CONTROLLER_LABEL} --output jsonpath={.items[*].metadata.name} )
@@ -89,7 +89,7 @@ elif [ "$TYPE"x == "detail"x ] ; then
     fi
 
     echo ""
-    echo "=============== koffloader-controller describe ============== "
+    echo "=============== rocktemplate-controller describe ============== "
     for POD in $CONTROLLER_POD_LIST ; do
       echo ""
       echo "--------- kubectl describe pod ${POD} -n ${COMPONENT_NAMESPACE}"
@@ -97,7 +97,7 @@ elif [ "$TYPE"x == "detail"x ] ; then
     done
 
     echo ""
-    echo "=============== koffloader-agent describe ============== "
+    echo "=============== rocktemplate-agent describe ============== "
     for POD in $AGENT_POD_LIST ; do
       echo ""
       echo "---------kubectl describe pod ${POD} -n ${COMPONENT_NAMESPACE} "
@@ -105,7 +105,7 @@ elif [ "$TYPE"x == "detail"x ] ; then
     done
 
     echo ""
-    echo "=============== koffloader-controller logs ============== "
+    echo "=============== rocktemplate-controller logs ============== "
     for POD in $CONTROLLER_POD_LIST ; do
       echo ""
       echo "---------kubectl logs ${POD} -n ${COMPONENT_NAMESPACE}"
@@ -115,7 +115,7 @@ elif [ "$TYPE"x == "detail"x ] ; then
     done
 
     echo ""
-    echo "=============== koffloader-agent logs ============== "
+    echo "=============== rocktemplate-agent logs ============== "
     for POD in $AGENT_POD_LIST ; do
       echo ""
       echo "--------- kubectl logs ${POD} -n ${COMPONENT_NAMESPACE} "
@@ -130,7 +130,7 @@ elif [ "$TYPE"x == "detail"x ] ; then
 
     echo ""
     echo "=============== node log  ============== "
-    KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-"koffloader"}
+    KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME:-"rocktemplate"}
     KIND_NODES=$(  kind get  nodes --name ${KIND_CLUSTER_NAME} )
     [ -z "$KIND_NODES" ] && echo "warning, failed to find nodes of kind cluster $KIND_CLUSTER_NAME " || true
     for NODE in $KIND_NODES ; do

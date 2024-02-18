@@ -59,9 +59,9 @@ rules:
   - get
   - update
 - apiGroups:
-  - koffloader.koffloader.io
+  - rocktemplate.spidernet.io
   resources:
-  - kclusters
+  - mybooks
   verbs:
   - create
   - delete
@@ -71,9 +71,9 @@ rules:
   - update
   - watch
 - apiGroups:
-  - koffloader.koffloader.io
+  - rocktemplate.spidernet.io
   resources:
-  - kclusters/status
+  - mybooks/status
   verbs:
   - get
   - patch

@@ -1,7 +1,7 @@
 name: Lint CODEOWNERS checks
 
 env:
-  REPOSITY_NAME: github.com/koffloader-io/koffloader
+  REPOSITY_NAME: github.com/spidernet-io/rocktemplate
 
 # Any change in triggers needs to be reflected in the concurrency group.
 on:

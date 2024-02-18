@@ -8,8 +8,8 @@ roleRef:
   name: {{ include "project.name" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
+    name: {{ .Values.rocktemplateAgent.name | trunc 63 | trimSuffix "-" }}
     namespace: {{ .Release.Namespace }}
   - kind: ServiceAccount
-    name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+    name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
     namespace: {{ .Release.Namespace }}

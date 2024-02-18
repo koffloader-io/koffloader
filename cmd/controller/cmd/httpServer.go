@@ -1,4 +1,4 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/koffloader-io/koffloader/api/v1/http/server"
-	"github.com/koffloader-io/koffloader/api/v1/http/server/restapi"
-	"github.com/koffloader-io/koffloader/api/v1/http/server/restapi/healthy"
-	"github.com/koffloader-io/koffloader/pkg/types"
+	"github.com/spidernet-io/rocktemplate/api/v1/http/server"
+	"github.com/spidernet-io/rocktemplate/api/v1/http/server/restapi"
+	"github.com/spidernet-io/rocktemplate/api/v1/http/server/restapi/healthy"
+	"github.com/spidernet-io/rocktemplate/pkg/types"
 	"go.uber.org/zap"
 )
 

@@ -15,17 +15,24 @@
 package prometheus // import "go.opentelemetry.io/otel/exporters/prometheus"
 
 import (
+	"strings"
+
 	"github.com/prometheus/client_golang/prometheus"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/metric"
 )
 
 // config contains options for the exporter.
 type config struct {
-	registerer        prometheus.Registerer
-	disableTargetInfo bool
-	withoutUnits      bool
-	aggregation       metric.AggregationSelector
+	registerer               prometheus.Registerer
+	disableTargetInfo        bool
+	withoutUnits             bool
+	withoutCounterSuffixes   bool
+	readerOpts               []metric.ManualReaderOption
+	disableScopeInfo         bool
+	namespace                string
+	resourceAttributesFilter attribute.Filter
 }
 
 // newConfig creates a validated config configured with options.
@@ -40,14 +47,6 @@ func newConfig(opts ...Option) config {
 	}
 
 	return cfg
-}
-
-func (cfg config) manualReaderOptions() []metric.ManualReaderOption {
-	opts := []metric.ManualReaderOption{}
-	if cfg.aggregation != nil {
-		opts = append(opts, metric.WithAggregationSelector(cfg.aggregation))
-	}
-	return opts
 }
 
 // Option sets exporter option values.
@@ -76,7 +75,16 @@ func WithRegisterer(reg prometheus.Registerer) Option {
 // used.
 func WithAggregationSelector(agg metric.AggregationSelector) Option {
 	return optionFunc(func(cfg config) config {
-		cfg.aggregation = agg
+		cfg.readerOpts = append(cfg.readerOpts, metric.WithAggregationSelector(agg))
+		return cfg
+	})
+}
+
+// WithProducer configure the metric Producer the exporter will use as a source
+// of external metric data.
+func WithProducer(producer metric.Producer) Option {
+	return optionFunc(func(cfg config) config {
+		cfg.readerOpts = append(cfg.readerOpts, metric.WithProducer(producer))
 		return cfg
 	})
 }
@@ -102,6 +110,57 @@ func WithoutTargetInfo() Option {
 func WithoutUnits() Option {
 	return optionFunc(func(cfg config) config {
 		cfg.withoutUnits = true
+		return cfg
+	})
+}
+
+// WithoutCounterSuffixes disables exporter's addition _total suffixes on counters.
+//
+// By default, metric names include a _total suffix to follow Prometheus naming
+// conventions. For example, the counter metric happy.people would become
+// happy_people_total. With this option set, the name would instead be
+// happy_people.
+func WithoutCounterSuffixes() Option {
+	return optionFunc(func(cfg config) config {
+		cfg.withoutCounterSuffixes = true
+		return cfg
+	})
+}
+
+// WithoutScopeInfo configures the Exporter to not export the otel_scope_info metric.
+// If not specified, the Exporter will create a otel_scope_info metric containing
+// the metrics' Instrumentation Scope, and also add labels about Instrumentation Scope to all metric points.
+func WithoutScopeInfo() Option {
+	return optionFunc(func(cfg config) config {
+		cfg.disableScopeInfo = true
+		return cfg
+	})
+}
+
+// WithNamespace configures the Exporter to prefix metric with the given namespace.
+// Metadata metrics such as target_info and otel_scope_info are not prefixed since these
+// have special behavior based on their name.
+func WithNamespace(ns string) Option {
+	return optionFunc(func(cfg config) config {
+		ns = sanitizeName(ns)
+		if !strings.HasSuffix(ns, "_") {
+			// namespace and metric names should be separated with an underscore,
+			// adds a trailing underscore if there is not one already.
+			ns = ns + "_"
+		}
+
+		cfg.namespace = ns
+		return cfg
+	})
+}
+
+// WithResourceAsConstantLabels configures the Exporter to add the resource attributes the
+// resourceFilter returns true for as attributes on all exported metrics.
+//
+// The does not affect the target info generated from resource attributes.
+func WithResourceAsConstantLabels(resourceFilter attribute.Filter) Option {
+	return optionFunc(func(cfg config) config {
+		cfg.resourceAttributesFilter = resourceFilter
 		return cfg
 	})
 }

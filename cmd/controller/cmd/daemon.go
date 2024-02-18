@@ -1,14 +1,15 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
 	"context"
-	"github.com/koffloader-io/koffloader/pkg/debug"
-	"github.com/koffloader-io/koffloader/pkg/kclusterManager"
-	"github.com/koffloader-io/koffloader/pkg/types"
+	"github.com/spidernet-io/rocktemplate/pkg/debug"
+	"github.com/spidernet-io/rocktemplate/pkg/mybookManager"
+	"github.com/spidernet-io/rocktemplate/pkg/types"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"path/filepath"
 	"time"
 )
@@ -41,20 +42,17 @@ func DaemonMain() {
 	MetricGaugeEndpoint.Add(context.Background(), -10)
 	MetricGaugeEndpoint.Add(context.Background(), 5)
 
-	attrs := []attribute.KeyValue{
-		attribute.Key("pod1").String("value1"),
-	}
-	MetricCounterRequest.Add(context.Background(), 10, attrs...)
-	attrs = []attribute.KeyValue{
-		attribute.Key("pod2").String("value1"),
-	}
-	MetricCounterRequest.Add(context.Background(), 5, attrs...)
+	attrs := attribute.NewSet(attribute.String("pod1", "value1"), attribute.Int("version", 1))
+	MetricCounterRequest.Add(context.Background(), 10, metric.WithAttributeSet(attrs))
+
+	attrs = attribute.NewSet(attribute.String("pod2", "value1"), attribute.Int("version", 1))
+	MetricCounterRequest.Add(context.Background(), 5, metric.WithAttributeSet(attrs))
 
 	MetricHistogramDuration.Record(context.Background(), 10)
 	MetricHistogramDuration.Record(context.Background(), 20)
 
 	// ----------
-	s := kclusterManager.New(rootLogger.Named("kcluster"))
+	s := mybookManager.New(rootLogger.Named("mybook"))
 	s.RunController("testlease", types.ControllerConfig.PodNamespace, types.ControllerConfig.PodName)
 	s.RunWebhookServer(int(types.ControllerConfig.WebhookPort), filepath.Dir(types.ControllerConfig.TlsServerCertPath))
 

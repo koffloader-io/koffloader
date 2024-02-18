@@ -1,4 +1,4 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package grpcManager
@@ -6,8 +6,8 @@ package grpcManager
 import (
 	"context"
 	"fmt"
-	"github.com/koffloader-io/koffloader/api/v1/grpcService"
 	"github.com/pkg/errors"
+	"github.com/spidernet-io/rocktemplate/api/v1/grpcService"
 	"go.uber.org/zap"
 )
 

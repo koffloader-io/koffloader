@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright Authors of koffloader-io
+// Copyright Authors of spidernet-io
 
 //go:build lockdebug
 // +build lockdebug
@@ -8,7 +8,7 @@ package lock_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
-	"github.com/koffloader-io/koffloader/pkg/lock"
+	"github.com/spidernet-io/rocktemplate/pkg/lock"
 )
 
 var _ = Describe("LockFast", Label("unitest"), func() {

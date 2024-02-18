@@ -78,7 +78,7 @@ install_proscope:
 
 #==================
 
-# this will auto tag github ci image : agent:xxx -> github.com/koffloader-io/koffloader/agent:xxx
+# this will auto tag github ci image : agent:xxx -> github.com/spidernet-io/rocktemplate/agent:xxx
 .PHONY: check_images_ready
 check_images_ready:
 	echo "check image  " ; \
@@ -134,11 +134,11 @@ deploy_project:
     	if [ -n "$(PYROSCOPE_LOCAL_PORT)" ] ; then \
 			echo "add env" ; \
 			ServerAddress=$$(docker network inspect kind -f {{\(index\ $$.IPAM.Config\ 0\).Gateway}}) ; \
-			HELM_OPTION+=" --set koffloaderAgent.extraEnv[0].name=ENV_PYROSCOPE_PUSH_SERVER_ADDRESS  --set koffloaderAgent.extraEnv[0].value=http://$${ServerAddress}:$(PYROSCOPE_LOCAL_PORT) " ; \
-			HELM_OPTION+=" --set koffloaderController.extraEnv[0].name=ENV_PYROSCOPE_PUSH_SERVER_ADDRESS  --set koffloaderController.extraEnv[0].value=http://$${ServerAddress}:$(PYROSCOPE_LOCAL_PORT) " ; \
+			HELM_OPTION+=" --set rocktemplateAgent.extraEnv[0].name=ENV_PYROSCOPE_PUSH_SERVER_ADDRESS  --set rocktemplateAgent.extraEnv[0].value=http://$${ServerAddress}:$(PYROSCOPE_LOCAL_PORT) " ; \
+			HELM_OPTION+=" --set rocktemplateController.extraEnv[0].name=ENV_PYROSCOPE_PUSH_SERVER_ADDRESS  --set rocktemplateController.extraEnv[0].value=http://$${ServerAddress}:$(PYROSCOPE_LOCAL_PORT) " ; \
 		fi ; \
-		HELM_OPTION+=" --set koffloaderAgent.debug.logLevel=debug --set koffloaderController.debug.logLevel=debug " ; \
-		HELM_OPTION+=" --set koffloaderAgent.prometheus.enabled=true --set koffloaderController.prometheus.enabled=true  " ; \
+		HELM_OPTION+=" --set rocktemplateAgent.debug.logLevel=debug --set rocktemplateController.debug.logLevel=debug " ; \
+		HELM_OPTION+=" --set rocktemplateAgent.prometheus.enabled=true --set rocktemplateController.prometheus.enabled=true  " ; \
 		helm --kubeconfig=$(KIND_KUBECONFIG) install project $(ROOT_DIR)/charts \
 				-n $(E2E_INSTALL_NAMESPACE) --create-namespace --wait --debug \
 				--set global.imageTagOverride=$(PROJECT_IMAGE_VERSION) \

@@ -1,7 +1,7 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 package types
 
 const (
-	TlsCaCommonName = "koffloader.io"
+	TlsCaCommonName = "spidernet.io"
 )

@@ -70,7 +70,7 @@ jobs:
       - name: Setup Golang
         uses: actions/setup-go@v4
         with:
-          go-version: 1.22.0
+          go-version: 1.21.7
           id: go
 
       # https://github.com/helm/kind-action

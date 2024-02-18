@@ -13,11 +13,11 @@ Expand the name of project .
 {{- end }}
 
 {{/*
-koffloaderAgent Common labels
+rocktemplateAgent Common labels
 */}}
-{{- define "project.koffloaderAgent.labels" -}}
+{{- define "project.rocktemplateAgent.labels" -}}
 helm.sh/chart: {{ include "project.chart" . }}
-{{ include "project.koffloaderAgent.selectorLabels" . }}
+{{ include "project.rocktemplateAgent.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -25,11 +25,11 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-koffloaderAgent Common labels
+rocktemplateAgent Common labels
 */}}
-{{- define "project.koffloaderController.labels" -}}
+{{- define "project.rocktemplateController.labels" -}}
 helm.sh/chart: {{ include "project.chart" . }}
-{{ include "project.koffloaderController.selectorLabels" . }}
+{{ include "project.rocktemplateController.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -37,21 +37,21 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-koffloaderAgent Selector labels
+rocktemplateAgent Selector labels
 */}}
-{{- define "project.koffloaderAgent.selectorLabels" -}}
+{{- define "project.rocktemplateAgent.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "project.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/component: {{ .Values.rocktemplateAgent.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-koffloaderAgent Selector labels
+rocktemplateAgent Selector labels
 */}}
-{{- define "project.koffloaderController.selectorLabels" -}}
+{{- define "project.rocktemplateController.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "project.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+app.kubernetes.io/component: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
@@ -107,11 +107,11 @@ Return the appropriate apiVersion for RBAC resources.
 {{- end -}}
 
 {{/*
-return the koffloaderAgent image
+return the rocktemplateAgent image
 */}}
-{{- define "project.koffloaderAgent.image" -}}
-{{- $registryName := .Values.koffloaderAgent.image.registry -}}
-{{- $repositoryName := .Values.koffloaderAgent.image.repository -}}
+{{- define "project.rocktemplateAgent.image" -}}
+{{- $registryName := .Values.rocktemplateAgent.image.registry -}}
+{{- $repositoryName := .Values.rocktemplateAgent.image.repository -}}
 {{- if .Values.global.imageRegistryOverride }}
     {{- printf "%s/%s" .Values.global.imageRegistryOverride $repositoryName -}}
 {{ else if $registryName }}
@@ -119,12 +119,12 @@ return the koffloaderAgent image
 {{- else -}}
     {{- printf "%s" $repositoryName -}}
 {{- end -}}
-{{- if .Values.koffloaderAgent.image.digest }}
-    {{- print "@" .Values.koffloaderAgent.image.digest -}}
+{{- if .Values.rocktemplateAgent.image.digest }}
+    {{- print "@" .Values.rocktemplateAgent.image.digest -}}
 {{- else if .Values.global.imageTagOverride -}}
     {{- printf ":%s" .Values.global.imageTagOverride -}}
-{{- else if .Values.koffloaderAgent.image.tag -}}
-    {{- printf ":%s" .Values.koffloaderAgent.image.tag -}}
+{{- else if .Values.rocktemplateAgent.image.tag -}}
+    {{- printf ":%s" .Values.rocktemplateAgent.image.tag -}}
 {{- else -}}
     {{- printf ":v%s" .Chart.AppVersion -}}
 {{- end -}}
@@ -132,11 +132,11 @@ return the koffloaderAgent image
 
 
 {{/*
-return the koffloaderController image
+return the rocktemplateController image
 */}}
-{{- define "project.koffloaderController.image" -}}
-{{- $registryName := .Values.koffloaderController.image.registry -}}
-{{- $repositoryName := .Values.koffloaderController.image.repository -}}
+{{- define "project.rocktemplateController.image" -}}
+{{- $registryName := .Values.rocktemplateController.image.registry -}}
+{{- $repositoryName := .Values.rocktemplateController.image.repository -}}
 {{- if .Values.global.imageRegistryOverride }}
     {{- printf "%s/%s" .Values.global.imageRegistryOverride $repositoryName -}}
 {{ else if $registryName }}
@@ -144,12 +144,12 @@ return the koffloaderController image
 {{- else -}}
     {{- printf "%s" $repositoryName -}}
 {{- end -}}
-{{- if .Values.koffloaderController.image.digest }}
-    {{- print "@" .Values.koffloaderController.image.digest -}}
+{{- if .Values.rocktemplateController.image.digest }}
+    {{- print "@" .Values.rocktemplateController.image.digest -}}
 {{- else if .Values.global.imageTagOverride -}}
     {{- printf ":%s" .Values.global.imageTagOverride -}}
-{{- else if .Values.koffloaderController.image.tag -}}
-    {{- printf ":%s" .Values.koffloaderController.image.tag -}}
+{{- else if .Values.rocktemplateController.image.tag -}}
+    {{- printf ":%s" .Values.rocktemplateController.image.tag -}}
 {{- else -}}
     {{- printf ":v%s" .Chart.AppVersion -}}
 {{- end -}}
@@ -160,6 +160,6 @@ return the koffloaderController image
 generate the CA cert
 */}}
 {{- define "generate-ca-certs" }}
-    {{- $ca := genCA "koffloader.io" (.Values.koffloaderController.tls.auto.caExpiration | int) -}}
+    {{- $ca := genCA "spidernet.io" (.Values.rocktemplateController.tls.auto.caExpiration | int) -}}
     {{- $_ := set . "ca" $ca -}}
 {{- end }}

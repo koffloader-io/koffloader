@@ -1,4 +1,4 @@
-// Copyright 2024 Authors of koffloader-io
+// Copyright 2022 Authors of spidernet-io
 // SPDX-License-Identifier: Apache-2.0
 
 package utils
@@ -11,8 +11,8 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"github.com/koffloader-io/koffloader/pkg/types"
 	"github.com/pkg/errors"
+	"github.com/spidernet-io/rocktemplate/pkg/types"
 	"k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/keyutil"
 	netutils "k8s.io/utils/net"

@@ -2,27 +2,29 @@
 
 ## copy
 
-1. copy repo
+1. copy repo `cp -rf rocktemplate/*  YourRepoName  && cp rocktemplate/.gitignore YourRepoName  && cp rocktemplate/.github  YourRepoName `
 
-   replace all 'koffloader' to 'YourRepoName'
+   replace all 'rocktemplate' to 'YourRepoName'
 
-   replace all 'koffloader-io' and 'koffloader.io' to 'YourOrigin'
+   replace all 'spidernet-io' and 'spidernet.io' to 'YourOrigin'
+
+   replace all 'Copyright 2022' to be the right time
 
 2. grep "====modify====" * -RHn --colour  and modify all of them
 
-3. update api/v1/openapi.yaml and `make update_openapi_sdk`
+3. in a linux machine, update api/v1/openapi.yaml and `make update_openapi_sdk`
 
 4. redefine CRD in pkg/k8s/v1
-    rename directory name 'pkg/k8s/v1/koffloader.koffloader.io' 
-    replace all 'kcluster' to 'YourCRDName'
-    and `make update_crd_sdk`, and code pkg/kclusterManager
+    rename directory name 'pkg/k8s/apis/rocktemplate.spidernet.io' 
+    replace all 'mybook' to 'YourCRDName'
+    and `make update_crd_sdk`, and write code in pkg/mybookManager
 
-    rename pkg/kclusterManager and replace all 'kcluster' with your CRD name in this directory
+    rename pkg/mybookManager and replace all 'mybook' with your CRD name in this directory
 
-    rm charts/crds/koffloader.koffloader.io_kclusters.yaml 
+    rm charts/crds/rocktemplate.spidernet.io_mybooks.yaml 
 
-    in repo: replace all "github.com/koffloader-io/spiderdoctor/pkg/kclusterManager" to "github.com/koffloader-io/spiderdoctor/pkg/${crdName}Manager"
-    in repo: find and replace all "kcluster" to YourCrd
+    # in repo: replace all "github.com/spidernet-io/spiderdoctor/pkg/mybookManager" to "github.com/spidernet-io/spiderdoctor/pkg/${crdName}Manager"
+    # in repo: find and replace all "mybook" to YourCrd
 
 5. update charts/ , and images/ , and CODEOWNERS
 
@@ -43,16 +45,16 @@
    codecov: https://github.com/marketplace/codecov  and https://app.codecov.io/gh
 
 10. github seetings:
-      koffloader.io/REPO  -> settings -> secrets and variable -> actions -> add secret 'WELAN_PAT' , 'ACTIONS_RUNNER_DEBUG'=true , 'ACTIONS_STEP_DEBUG'=true, 'CODECOV_TOKEN'
+      spidernet.io/REPO  -> settings -> secrets and variable -> actions -> add secret 'WELAN_PAT' , 'ACTIONS_RUNNER_DEBUG'=true , 'ACTIONS_STEP_DEBUG'=true, 'CODECOV_TOKEN'
 
-      koffloader.io  -> settings -> secrets -> actions -> grant secret to repo
+      spidernet.io  -> settings -> secrets -> actions -> grant secret to repo
 
-      koffloader.io/REPO  -> settings -> general -> feature -> issue
+      spidernet.io/REPO  -> settings -> general -> feature -> issue
 
-      koffloader.io/ORG  -> settings -> actions -> general -> allow github action to create pr
-      koffloader.io/REPO  -> settings -> actions -> general -> allow github action to create pr
+      spidernet.io/ORG  -> settings -> actions -> general -> allow github action to create pr
+      spidernet.io/REPO  -> settings -> actions -> general -> allow github action to create pr
 
-      koffloader.io  -> settings -> packages -> public 
+      spidernet.io  -> settings -> packages -> public 
 
       repo -> packages -> package settings -> Change package visibility
 
@@ -83,8 +85,6 @@
 12. build base image , 
     update BASE_IMAGE in images/agent/Dockerfile and images/controller/Dockerfile
     run test
- 
-
 
 ## local develop
 
@@ -98,22 +98,23 @@
 
 5. apply cr
 
-        cat <<EOF > kcluster.yaml
-        apiVersion: koffloader.koffloader.io/v1
-        kind: kcluster
+        cat <<EOF > mybook.yaml
+        apiVersion: rocktemplate.spidernet.io/v1
+        kind: Mybook
         metadata:
           name: test
         spec:
           ipVersion: 4
           subnet: "1.0.0.0/8"
         EOF
-        kubectl apply -f kcluster.yaml
+        kubectl apply -f mybook.yaml
 
 ## chart develop
 
-helm repo add rock https://koffloader-io.github.io/koffloader/
+helm repo add rock https://spidernet-io.github.io/rocktemplate/
 
 ## upgrade project 
 
 1. golang version: edit golang version in Makefile.defs and `make update_go_version`
 
+2. 更新所有包  go get -u ./...

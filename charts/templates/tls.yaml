@@ -1,37 +1,37 @@
-{{- if (eq .Values.koffloaderController.tls.method "auto") }}
+{{- if (eq .Values.rocktemplateController.tls.method "auto") }}
 {{- $_ := include "generate-ca-certs" . }}
 {{- end }}
 
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
   annotations:
-    {{- if (eq .Values.koffloaderController.tls.method "certmanager") }}
-    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}-server-certs
+    {{- if (eq .Values.rocktemplateController.tls.method "certmanager") }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}-server-certs
     {{- end }}
 webhooks:
   - admissionReviewVersions:
       - v1
     clientConfig:
       service:
-        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/mutate-koffloader-koffloader-io-v1-kcluster"
-        port: {{ .Values.koffloaderController.webhookPort }}
-      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
-      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
-      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+        path: "/mutate-rocktemplate-spidernet-io-v1-mybook"
+        port: {{ .Values.rocktemplateController.webhookPort }}
+      {{- if (eq .Values.rocktemplateController.tls.method "provided") }}
+      caBundle: {{ .Values.rocktemplateController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.rocktemplateController.tls.method "auto") }}
       caBundle: {{ .ca.Cert | b64enc }}
       {{- end }}
     failurePolicy: Fail
     # ====modify====
-    name: kcluster.koffloader.koffloader.io
+    name: mybook.rocktemplate.spidernet.io
     rules:
       - apiGroups:
           # ====modify====
-          - koffloader.koffloader.io
+          - rocktemplate.spidernet.io
         apiVersions:
           - v1
         operations:
@@ -40,40 +40,40 @@ webhooks:
           - DELETE
         resources:
           # ====modify==== crdName
-          - kclusters
+          - mybooks
     sideEffects: None
 
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
   annotations:
-    {{- if (eq .Values.koffloaderController.tls.method "certmanager") }}
-    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}-server-certs
+    {{- if (eq .Values.rocktemplateController.tls.method "certmanager") }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/{{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}-server-certs
     {{- end }}
 webhooks:
   - admissionReviewVersions:
       - v1
     clientConfig:
       service:
-        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/validate-koffloader-koffloader-io-v1-kcluster"
-        port: {{ .Values.koffloaderController.webhookPort }}
-      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
-      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
-      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+        path: "/validate-rocktemplate-spidernet-io-v1-mybook"
+        port: {{ .Values.rocktemplateController.webhookPort }}
+      {{- if (eq .Values.rocktemplateController.tls.method "provided") }}
+      caBundle: {{ .Values.rocktemplateController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.rocktemplateController.tls.method "auto") }}
       caBundle: {{ .ca.Cert | b64enc }}
       {{- end }}
     failurePolicy: Fail
     # ====modify====
-    name: kcluster.koffloader.koffloader.io
+    name: mybook.rocktemplate.spidernet.io
     rules:
       - apiGroups:
           # ====modify====
-          - koffloader.koffloader.io
+          - rocktemplate.spidernet.io
         apiVersions:
           - v1
         operations:
@@ -82,68 +82,68 @@ webhooks:
           - DELETE
         resources:
           # ====modify==== crdName
-          - kclusters
+          - mybooks
     sideEffects: None
 
-{{- if eq .Values.koffloaderController.tls.method "certmanager" -}}
+{{- if eq .Values.rocktemplateController.tls.method "certmanager" -}}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}-server-certs
+  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}-server-certs
   namespace: {{ .Release.Namespace }}
 spec:
   issuerRef:
-    name: {{ .Values.koffloaderController.tls.certmanager.issuerName | trunc 63 | trimSuffix "-" }}
-  secretName: {{ .Values.koffloaderController.tls.secretName | trunc 63 | trimSuffix "-" }}
-  commonName: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc
+    name: {{ .Values.rocktemplateController.tls.certmanager.issuerName | trunc 63 | trimSuffix "-" }}
+  secretName: {{ .Values.rocktemplateController.tls.secretName | trunc 63 | trimSuffix "-" }}
+  commonName: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc
   dnsNames:
-    - {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
-    - {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}
-    - {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc
-    - {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDnsDomain }}
-  {{- range $dns := .Values.koffloaderController.tls.certmanager.extraDnsNames }}
+    - {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
+    - {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}
+    - {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc
+    - {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}.svc.{{ .Values.global.clusterDnsDomain }}
+  {{- range $dns := .Values.rocktemplateController.tls.certmanager.extraDnsNames }}
   - {{ $dns | quote }}
   {{- end }}
-  {{- if .Values.koffloaderController.tls.certmanager.extraIPAddresses }}
+  {{- if .Values.rocktemplateController.tls.certmanager.extraIPAddresses }}
   ipAddresses:
-  {{- range $ip := .Values.koffloaderController.tls.certmanager.extraIPAddresses }}
+  {{- range $ip := .Values.rocktemplateController.tls.certmanager.extraIPAddresses }}
   - {{ $ip | quote }}
   {{- end }}
   {{- end }}
-  duration: {{ printf "%dh" (mul .Values.koffloaderController.tls.certmanager.certValidityDuration 24) }}
+  duration: {{ printf "%dh" (mul .Values.rocktemplateController.tls.certmanager.certValidityDuration 24) }}
   {{- end }}
 
-{{- if (eq .Values.koffloaderController.tls.method "provided") }}
+{{- if (eq .Values.rocktemplateController.tls.method "provided") }}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Values.koffloaderController.tls.secretName | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.rocktemplateController.tls.secretName | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace }}
 type: kubernetes.io/tls
 data:
-  ca.crt:  {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
-  tls.crt: {{ .Values.koffloaderController.tls.provided.tlsCert | required "missing tls.provided.tlsCert" }}
-  tls.key: {{ .Values.koffloaderController.tls.provided.tlsKey  | required "missing tls.provided.tlsKey"  }}
+  ca.crt:  {{ .Values.rocktemplateController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+  tls.crt: {{ .Values.rocktemplateController.tls.provided.tlsCert | required "missing tls.provided.tlsCert" }}
+  tls.key: {{ .Values.rocktemplateController.tls.provided.tlsKey  | required "missing tls.provided.tlsKey"  }}
   {{- end }}
 
-{{- if eq .Values.koffloaderController.tls.method "auto" }}
+{{- if eq .Values.rocktemplateController.tls.method "auto" }}
 ---
-{{- $cn := printf "koffloader.io" }}
-{{- $ip := .Values.koffloaderController.tls.auto.extraIpAddresses }}
-{{- $dns1 := printf "%s.%s" .Values.koffloaderController.name .Release.Namespace }}
-{{- $dns2 := printf "%s.%s.svc" .Values.koffloaderController.name .Release.Namespace }}
-{{- $dns3 := printf "%s.%s.svc.%s" .Values.koffloaderController.name .Release.Namespace .Values.global.clusterDnsDomain }}
-{{- $dns := prepend .Values.koffloaderController.tls.auto.extraDnsNames $dns1 }}
+{{- $cn := printf "spidernet.io" }}
+{{- $ip := .Values.rocktemplateController.tls.auto.extraIpAddresses }}
+{{- $dns1 := printf "%s.%s" .Values.rocktemplateController.name .Release.Namespace }}
+{{- $dns2 := printf "%s.%s.svc" .Values.rocktemplateController.name .Release.Namespace }}
+{{- $dns3 := printf "%s.%s.svc.%s" .Values.rocktemplateController.name .Release.Namespace .Values.global.clusterDnsDomain }}
+{{- $dns := prepend .Values.rocktemplateController.tls.auto.extraDnsNames $dns1 }}
 {{- $dns = prepend $dns $dns2 }}
 {{- $dns = prepend $dns $dns3 }}
 {{- $dns = prepend $dns $cn }}
-{{- $cert := genSignedCert $cn $ip $dns (.Values.koffloaderController.tls.auto.certExpiration | int) .ca }}
+{{- $cert := genSignedCert $cn $ip $dns (.Values.rocktemplateController.tls.auto.certExpiration | int) .ca }}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Values.koffloaderController.tls.secretName | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.rocktemplateController.tls.secretName | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace }}
 type: kubernetes.io/tls
 data:

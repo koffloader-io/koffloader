@@ -1,24 +1,24 @@
-{{- if .Values.koffloaderAgent.prometheus.serviceMonitor.install -}}
+{{- if .Values.rocktemplateAgent.prometheus.serviceMonitor.install -}}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
-  namespace: {{ default .Release.Namespace .Values.koffloaderAgent.prometheus.serviceMonitor.namespace }}
+  name: {{ .Values.rocktemplateAgent.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.rocktemplateAgent.prometheus.serviceMonitor.namespace }}
   labels:
-    {{- include "project.koffloaderAgent.labels" . | nindent 4 }}
+    {{- include "project.rocktemplateAgent.labels" . | nindent 4 }}
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderAgent.prometheus.serviceMonitor.labels }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.serviceMonitor.labels "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateAgent.prometheus.serviceMonitor.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.prometheus.serviceMonitor.labels "context" $ ) | nindent 4 }}
     {{- end }}
-  {{- if or .Values.global.commonAnnotations .Values.koffloaderAgent.prometheus.serviceMonitor.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.rocktemplateAgent.prometheus.serviceMonitor.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderAgent.prometheus.serviceMonitor.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.serviceMonitor.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateAgent.prometheus.serviceMonitor.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.prometheus.serviceMonitor.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
@@ -31,36 +31,36 @@ spec:
       - {{ .Release.Namespace | quote }}
   selector:
     matchLabels:
-      {{- include "project.koffloaderAgent.selectorLabels" . | nindent 6 }}
+      {{- include "project.rocktemplateAgent.selectorLabels" . | nindent 6 }}
       {{- if .Values.global.commonLabels }}
       {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 6 }}
       {{- end }}
-      {{- if .Values.koffloaderAgent.podLabels }}
-      {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.podLabels "context" $ ) | nindent 6 }}
+      {{- if .Values.rocktemplateAgent.podLabels }}
+      {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.podLabels "context" $ ) | nindent 6 }}
       {{- end }}
   {{- end }}
 ---
-{{- if .Values.koffloaderController.prometheus.serviceMonitor.install -}}
+{{- if .Values.rocktemplateController.prometheus.serviceMonitor.install -}}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
-  namespace: {{ default .Release.Namespace .Values.koffloaderController.prometheus.serviceMonitor.namespace }}
+  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.rocktemplateController.prometheus.serviceMonitor.namespace }}
   labels:
-    {{- include "project.koffloaderController.labels" . | nindent 4 }}
+    {{- include "project.rocktemplateController.labels" . | nindent 4 }}
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderController.prometheus.serviceMonitor.labels }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.serviceMonitor.labels "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateController.prometheus.serviceMonitor.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.prometheus.serviceMonitor.labels "context" $ ) | nindent 4 }}
     {{- end }}
-  {{- if or .Values.global.commonAnnotations .Values.koffloaderController.prometheus.serviceMonitor.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.rocktemplateController.prometheus.serviceMonitor.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.koffloaderController.prometheus.serviceMonitor.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.serviceMonitor.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.rocktemplateController.prometheus.serviceMonitor.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.prometheus.serviceMonitor.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
 spec:
@@ -73,11 +73,11 @@ spec:
       - {{ .Release.Namespace | quote }}
   selector:
     matchLabels:
-      {{- include "project.koffloaderController.selectorLabels" . | nindent 6 }}
+      {{- include "project.rocktemplateController.selectorLabels" . | nindent 6 }}
       {{- if .Values.global.commonLabels }}
       {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 6 }}
       {{- end }}
-      {{- if .Values.koffloaderController.podLabels }}
-      {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.podLabels "context" $ ) | nindent 6 }}
+      {{- if .Values.rocktemplateController.podLabels }}
+      {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.podLabels "context" $ ) | nindent 6 }}
       {{- end }}
 {{- end }}
