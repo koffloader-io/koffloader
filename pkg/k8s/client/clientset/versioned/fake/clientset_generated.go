@@ -66,7 +66,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// koffloaderV1 retrieves the koffloaderV1Client
-func (c *Clientset) koffloaderV1() koffloaderv1.koffloaderV1Interface {
-	return &fakekoffloaderv1.FakekoffloaderV1{Fake: &c.Fake}
+// KoffloaderV1 retrieves the KoffloaderV1Client
+func (c *Clientset) KoffloaderV1() koffloaderv1.KoffloaderV1Interface {
+	return &fakekoffloaderv1.FakeKoffloaderV1{Fake: &c.Fake}
 }

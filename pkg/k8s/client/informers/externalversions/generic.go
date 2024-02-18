@@ -41,7 +41,7 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	switch resource {
 	// Group=koffloader.koffloader.io, Version=v1
 	case v1.SchemeGroupVersion.WithResource("kclusters"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.koffloader().V1().Kclusters().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Koffloader().V1().Kclusters().Informer()}, nil
 
 	}
 

@@ -8,7 +8,7 @@ package fake
 import (
 	"context"
 
-	koffloaderspidernetiov1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
+	koffloaderkoffloaderiov1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -19,7 +19,7 @@ import (
 
 // FakeKclusters implements KclusterInterface
 type FakeKclusters struct {
-	Fake *FakekoffloaderV1
+	Fake *FakeKoffloaderV1
 }
 
 var kclustersResource = schema.GroupVersionResource{Group: "koffloader.koffloader.io", Version: "v1", Resource: "kclusters"}
@@ -27,19 +27,19 @@ var kclustersResource = schema.GroupVersionResource{Group: "koffloader.koffloade
 var kclustersKind = schema.GroupVersionKind{Group: "koffloader.koffloader.io", Version: "v1", Kind: "Kcluster"}
 
 // Get takes name of the kcluster, and returns the corresponding kcluster object, and an error if there is any.
-func (c *FakeKclusters) Get(ctx context.Context, name string, options v1.GetOptions) (result *koffloaderspidernetiov1.Kcluster, err error) {
+func (c *FakeKclusters) Get(ctx context.Context, name string, options v1.GetOptions) (result *koffloaderkoffloaderiov1.Kcluster, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootGetAction(kclustersResource, name), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootGetAction(kclustersResource, name), &koffloaderkoffloaderiov1.Kcluster{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*koffloaderspidernetiov1.Kcluster), err
+	return obj.(*koffloaderkoffloaderiov1.Kcluster), err
 }
 
 // List takes label and field selectors, and returns the list of Kclusters that match those selectors.
-func (c *FakeKclusters) List(ctx context.Context, opts v1.ListOptions) (result *koffloaderspidernetiov1.KclusterList, err error) {
+func (c *FakeKclusters) List(ctx context.Context, opts v1.ListOptions) (result *koffloaderkoffloaderiov1.KclusterList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootListAction(kclustersResource, kclustersKind, opts), &koffloaderspidernetiov1.KclusterList{})
+		Invokes(testing.NewRootListAction(kclustersResource, kclustersKind, opts), &koffloaderkoffloaderiov1.KclusterList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -48,8 +48,8 @@ func (c *FakeKclusters) List(ctx context.Context, opts v1.ListOptions) (result *
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &koffloaderspidernetiov1.KclusterList{ListMeta: obj.(*koffloaderspidernetiov1.KclusterList).ListMeta}
-	for _, item := range obj.(*koffloaderspidernetiov1.KclusterList).Items {
+	list := &koffloaderkoffloaderiov1.KclusterList{ListMeta: obj.(*koffloaderkoffloaderiov1.KclusterList).ListMeta}
+	for _, item := range obj.(*koffloaderkoffloaderiov1.KclusterList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -64,40 +64,40 @@ func (c *FakeKclusters) Watch(ctx context.Context, opts v1.ListOptions) (watch.I
 }
 
 // Create takes the representation of a kcluster and creates it.  Returns the server's representation of the kcluster, and an error, if there is any.
-func (c *FakeKclusters) Create(ctx context.Context, kcluster *koffloaderspidernetiov1.Kcluster, opts v1.CreateOptions) (result *koffloaderspidernetiov1.Kcluster, err error) {
+func (c *FakeKclusters) Create(ctx context.Context, kcluster *koffloaderkoffloaderiov1.Kcluster, opts v1.CreateOptions) (result *koffloaderkoffloaderiov1.Kcluster, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootCreateAction(kclustersResource, kcluster), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootCreateAction(kclustersResource, kcluster), &koffloaderkoffloaderiov1.Kcluster{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*koffloaderspidernetiov1.Kcluster), err
+	return obj.(*koffloaderkoffloaderiov1.Kcluster), err
 }
 
 // Update takes the representation of a kcluster and updates it. Returns the server's representation of the kcluster, and an error, if there is any.
-func (c *FakeKclusters) Update(ctx context.Context, kcluster *koffloaderspidernetiov1.Kcluster, opts v1.UpdateOptions) (result *koffloaderspidernetiov1.Kcluster, err error) {
+func (c *FakeKclusters) Update(ctx context.Context, kcluster *koffloaderkoffloaderiov1.Kcluster, opts v1.UpdateOptions) (result *koffloaderkoffloaderiov1.Kcluster, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateAction(kclustersResource, kcluster), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootUpdateAction(kclustersResource, kcluster), &koffloaderkoffloaderiov1.Kcluster{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*koffloaderspidernetiov1.Kcluster), err
+	return obj.(*koffloaderkoffloaderiov1.Kcluster), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeKclusters) UpdateStatus(ctx context.Context, kcluster *koffloaderspidernetiov1.Kcluster, opts v1.UpdateOptions) (*koffloaderspidernetiov1.Kcluster, error) {
+func (c *FakeKclusters) UpdateStatus(ctx context.Context, kcluster *koffloaderkoffloaderiov1.Kcluster, opts v1.UpdateOptions) (*koffloaderkoffloaderiov1.Kcluster, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootUpdateSubresourceAction(kclustersResource, "status", kcluster), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootUpdateSubresourceAction(kclustersResource, "status", kcluster), &koffloaderkoffloaderiov1.Kcluster{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*koffloaderspidernetiov1.Kcluster), err
+	return obj.(*koffloaderkoffloaderiov1.Kcluster), err
 }
 
 // Delete takes name of the kcluster and deletes it. Returns an error if one occurs.
 func (c *FakeKclusters) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteActionWithOptions(kclustersResource, name, opts), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootDeleteActionWithOptions(kclustersResource, name, opts), &koffloaderkoffloaderiov1.Kcluster{})
 	return err
 }
 
@@ -105,16 +105,16 @@ func (c *FakeKclusters) Delete(ctx context.Context, name string, opts v1.DeleteO
 func (c *FakeKclusters) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewRootDeleteCollectionAction(kclustersResource, listOpts)
 
-	_, err := c.Fake.Invokes(action, &koffloaderspidernetiov1.KclusterList{})
+	_, err := c.Fake.Invokes(action, &koffloaderkoffloaderiov1.KclusterList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched kcluster.
-func (c *FakeKclusters) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *koffloaderspidernetiov1.Kcluster, err error) {
+func (c *FakeKclusters) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *koffloaderkoffloaderiov1.Kcluster, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(kclustersResource, name, pt, data, subresources...), &koffloaderspidernetiov1.Kcluster{})
+		Invokes(testing.NewRootPatchSubresourceAction(kclustersResource, name, pt, data, subresources...), &koffloaderkoffloaderiov1.Kcluster{})
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*koffloaderspidernetiov1.Kcluster), err
+	return obj.(*koffloaderkoffloaderiov1.Kcluster), err
 }

@@ -13,24 +13,24 @@ import (
 	rest "k8s.io/client-go/rest"
 )
 
-type koffloaderV1Interface interface {
+type KoffloaderV1Interface interface {
 	RESTClient() rest.Interface
 	KclustersGetter
 }
 
-// koffloaderV1Client is used to interact with features provided by the koffloader.koffloader.io group.
-type koffloaderV1Client struct {
+// KoffloaderV1Client is used to interact with features provided by the koffloader.koffloader.io group.
+type KoffloaderV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *koffloaderV1Client) Kclusters() KclusterInterface {
+func (c *KoffloaderV1Client) Kclusters() KclusterInterface {
 	return newKclusters(c)
 }
 
-// NewForConfig creates a new koffloaderV1Client for the given config.
+// NewForConfig creates a new KoffloaderV1Client for the given config.
 // NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
 // where httpClient was generated with rest.HTTPClientFor(c).
-func NewForConfig(c *rest.Config) (*koffloaderV1Client, error) {
+func NewForConfig(c *rest.Config) (*KoffloaderV1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -42,9 +42,9 @@ func NewForConfig(c *rest.Config) (*koffloaderV1Client, error) {
 	return NewForConfigAndClient(&config, httpClient)
 }
 
-// NewForConfigAndClient creates a new koffloaderV1Client for the given config and http client.
+// NewForConfigAndClient creates a new KoffloaderV1Client for the given config and http client.
 // Note the http client provided takes precedence over the configured transport values.
-func NewForConfigAndClient(c *rest.Config, h *http.Client) (*koffloaderV1Client, error) {
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*KoffloaderV1Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -53,12 +53,12 @@ func NewForConfigAndClient(c *rest.Config, h *http.Client) (*koffloaderV1Client,
 	if err != nil {
 		return nil, err
 	}
-	return &koffloaderV1Client{client}, nil
+	return &KoffloaderV1Client{client}, nil
 }
 
-// NewForConfigOrDie creates a new koffloaderV1Client for the given config and
+// NewForConfigOrDie creates a new KoffloaderV1Client for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *koffloaderV1Client {
+func NewForConfigOrDie(c *rest.Config) *KoffloaderV1Client {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -66,9 +66,9 @@ func NewForConfigOrDie(c *rest.Config) *koffloaderV1Client {
 	return client
 }
 
-// New creates a new koffloaderV1Client for the given RESTClient.
-func New(c rest.Interface) *koffloaderV1Client {
-	return &koffloaderV1Client{c}
+// New creates a new KoffloaderV1Client for the given RESTClient.
+func New(c rest.Interface) *KoffloaderV1Client {
+	return &KoffloaderV1Client{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
@@ -86,7 +86,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *koffloaderV1Client) RESTClient() rest.Interface {
+func (c *KoffloaderV1Client) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

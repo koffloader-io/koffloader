@@ -9,7 +9,7 @@ import (
 	"context"
 	time "time"
 
-	koffloaderspidernetiov1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
+	koffloaderkoffloaderiov1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
 	versioned "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned"
 	internalinterfaces "github.com/koffloader-io/koffloader/pkg/k8s/client/informers/externalversions/internalinterfaces"
 	v1 "github.com/koffloader-io/koffloader/pkg/k8s/client/listers/koffloader.koffloader.io/v1"
@@ -48,16 +48,16 @@ func NewFilteredKclusterInformer(client versioned.Interface, resyncPeriod time.D
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.koffloaderV1().Kclusters().List(context.TODO(), options)
+				return client.KoffloaderV1().Kclusters().List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.koffloaderV1().Kclusters().Watch(context.TODO(), options)
+				return client.KoffloaderV1().Kclusters().Watch(context.TODO(), options)
 			},
 		},
-		&koffloaderspidernetiov1.Kcluster{},
+		&koffloaderkoffloaderiov1.Kcluster{},
 		resyncPeriod,
 		indexers,
 	)
@@ -68,7 +68,7 @@ func (f *kclusterInformer) defaultInformer(client versioned.Interface, resyncPer
 }
 
 func (f *kclusterInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&koffloaderspidernetiov1.Kcluster{}, f.defaultInformer)
+	return f.factory.InformerFor(&koffloaderkoffloaderiov1.Kcluster{}, f.defaultInformer)
 }
 
 func (f *kclusterInformer) Lister() v1.KclusterLister {

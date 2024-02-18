@@ -17,17 +17,17 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	koffloaderV1() koffloaderv1.koffloaderV1Interface
+	KoffloaderV1() koffloaderv1.KoffloaderV1Interface
 }
 
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	koffloaderV1 *koffloaderv1.koffloaderV1Client
+	koffloaderV1 *koffloaderv1.KoffloaderV1Client
 }
 
-// koffloaderV1 retrieves the koffloaderV1Client
-func (c *Clientset) koffloaderV1() koffloaderv1.koffloaderV1Interface {
+// KoffloaderV1 retrieves the KoffloaderV1Client
+func (c *Clientset) KoffloaderV1() koffloaderv1.KoffloaderV1Interface {
 	return c.koffloaderV1
 }
 

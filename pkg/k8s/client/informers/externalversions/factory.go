@@ -12,7 +12,7 @@ import (
 
 	versioned "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned"
 	internalinterfaces "github.com/koffloader-io/koffloader/pkg/k8s/client/informers/externalversions/internalinterfaces"
-	koffloaderspidernetio "github.com/koffloader-io/koffloader/pkg/k8s/client/informers/externalversions/koffloader.koffloader.io"
+	koffloaderkoffloaderio "github.com/koffloader-io/koffloader/pkg/k8s/client/informers/externalversions/koffloader.koffloader.io"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -230,9 +230,9 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
-	koffloader() koffloaderspidernetio.Interface
+	Koffloader() koffloaderkoffloaderio.Interface
 }
 
-func (f *sharedInformerFactory) koffloader() koffloaderspidernetio.Interface {
-	return koffloaderspidernetio.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Koffloader() koffloaderkoffloaderio.Interface {
+	return koffloaderkoffloaderio.New(f, f.namespace, f.tweakListOptions)
 }

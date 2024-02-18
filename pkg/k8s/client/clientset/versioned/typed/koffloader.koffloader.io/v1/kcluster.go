@@ -43,7 +43,7 @@ type kclusters struct {
 }
 
 // newKclusters returns a Kclusters
-func newKclusters(c *koffloaderV1Client) *kclusters {
+func newKclusters(c *KoffloaderV1Client) *kclusters {
 	return &kclusters{
 		client: c.RESTClient(),
 	}
