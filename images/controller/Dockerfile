@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # ====modify====
-ARG BASE_IMAGE=ghcr.io/koffloader-io/koffloader-controller-base:da74ed75a6af16ab18dd2095963dc82244c94177
+ARG BASE_IMAGE=ghcr.io/koffloader-io/koffloader-controller-base:3ea7c5113e9444a9c0d457e3f13eea834dd35047
 ARG GOLANG_IMAGE=docker.io/library/golang:1.21.7
 
 #======= build bin ==========
