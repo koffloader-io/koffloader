@@ -1,7 +1,0 @@
-# koffloader
-
-## Introduction
-
-## Features
-
-## Parameters
