@@ -85,7 +85,7 @@ build_local_controller_image:
 #---------
 
 define BUILD_BASE_IMAGE
-IMAGE_DIR=` dirname $(DOCKERFILE_PATH) ` \
+IMAGE_DIR=` dirname $(DOCKERFILE_PATH) ` ; \
 		sed -i '2 a \ARG TARGETPLATFORM' $(DOCKERFILE_PATH) ; \
 		sed -i '2 a \ARG BUILDPLATFORM' $(DOCKERFILE_PATH) ; \
 		TAG=` git ls-tree --full-tree HEAD -- $${IMAGE_DIR} | awk '{ print $$3 }' ` ; \
