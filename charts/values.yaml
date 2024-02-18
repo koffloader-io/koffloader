@@ -1,0 +1,446 @@
+
+## @section Global parameters
+##
+global:
+  ## @param global.imageRegistryOverride Global Docker image registry
+  imageRegistryOverride: ""
+
+  ## @param global.imageTagOverride Global Docker image tag
+  imageTagOverride: ""
+
+  ## @param global.name instance name
+  ## default koffloader
+  name: "koffloader"
+
+  ## @param global.clusterDnsDomain cluster dns domain
+  clusterDnsDomain: "cluster.local"
+
+  ## @param global.commonAnnotations Annotations to add to all deployed objects
+  commonAnnotations: {}
+
+  ## @param global.commonLabels Labels to add to all deployed objects
+  commonLabels: {}
+  #  label1: v1
+  #  labele: v2
+
+  ## @param global.configName the configmap name
+  configName: "koffloader"
+
+## @section feature parameters
+feature:
+  ## @param feature.enableIPv4 enable ipv4
+  enableIPv4: true
+
+  ## @param feature.enableIPv6 enable ipv6
+  enableIPv6: false
+
+## @section koffloaderAgent parameters
+##
+koffloaderAgent:
+  ## @param koffloaderAgent.name the koffloaderAgent name
+  name: "koffloader-agent"
+
+  ## @param koffloaderAgent.cmdBinName the binary name of koffloaderAgent
+  cmdBinName: "/usr/bin/agent"
+
+  ## @param koffloaderAgent.hostnetwork enable hostnetwork mode of koffloaderAgent pod
+  hostnetwork: true
+
+  image:
+    ## @param koffloaderAgent.image.registry the image registry of koffloaderAgent
+    registry: ghcr.io
+
+    ## @param koffloaderAgent.image.repository the image repository of koffloaderAgent
+    repository: koffloader-io/koffloader-agent
+
+    ## @param koffloaderAgent.image.pullPolicy the image pullPolicy of koffloaderAgent
+    pullPolicy: IfNotPresent
+
+    ## @param koffloaderAgent.image.digest the image digest of koffloaderAgent, which takes preference over tag
+    digest: ""
+
+    ## @param koffloaderAgent.image.tag the image tag of koffloaderAgent, overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+    ## @param koffloaderAgent.image.imagePullSecrets the image imagePullSecrets of koffloaderAgent
+    imagePullSecrets: []
+    # - name: "image-pull-secret"
+
+  ## @skip koffloaderAgent.nodeSelector.kubernetes.io/os
+  nodeSelector:
+    kubernetes.io/os: linux
+
+  serviceAccount:
+    ## @param koffloaderAgent.serviceAccount.create create the service account for the koffloaderAgent
+    create: true
+    ## @param koffloaderAgent.serviceAccount.annotations the annotations of koffloaderAgent service account
+    annotations: {}
+
+  ## @skip koffloaderAgent.updateStrategy.rollingUpdate.maxUnavailable
+  ## @skip koffloaderAgent.updateStrategy.type
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 2
+    type: RollingUpdate
+
+  service:
+    ## @param koffloaderAgent.service.annotations the annotations for koffloaderAgent service
+    annotations: {}
+    ## @param koffloaderAgent.service.type the type for koffloaderAgent service
+    type: ClusterIP
+
+  ## @skip koffloaderAgent.tolerations
+  tolerations:
+    - operator: Exists
+
+  ## @param koffloaderAgent.priorityClassName the priority Class Name for koffloaderAgent
+  priorityClassName: "system-node-critical"
+
+  ## @param koffloaderAgent.affinity the affinity of koffloaderAgent
+  affinity: {}
+
+  ## @param koffloaderAgent.extraArgs the additional arguments of koffloaderAgent container
+  extraArgs: []
+
+  ## @param koffloaderAgent.extraEnv the additional environment variables of koffloaderAgent container
+  extraEnv: []
+
+  ## @param koffloaderAgent.extraVolumes the additional volumes of koffloaderAgent container
+  extraVolumes: []
+
+  ## @param koffloaderAgent.extraVolumeMounts the additional hostPath mounts of koffloaderAgent container
+  extraVolumeMounts: []
+
+  ## @param koffloaderAgent.podAnnotations the additional annotations of koffloaderAgent pod
+  podAnnotations: {}
+
+  ## @param koffloaderAgent.podLabels the additional label of koffloaderAgent pod
+  podLabels: {}
+
+  resources:
+    ## @param koffloaderAgent.resources.limits.cpu the cpu limit of koffloaderAgent pod
+    ## @param koffloaderAgent.resources.limits.memory the memory limit of koffloaderAgent pod
+    ## @param koffloaderAgent.resources.requests.cpu the cpu requests of koffloaderAgent pod
+    ## @param koffloaderAgent.resources.requests.memory the memory requests of koffloaderAgent pod
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  ## @param koffloaderAgent.securityContext the security Context of koffloaderAgent pod
+  securityContext: {}
+  # runAsUser: 0
+
+  httpServer:
+    ## @param koffloaderAgent.httpServer.port the http Port for koffloaderAgent, for health checking
+    port: 5710
+
+    startupProbe:
+      ## @param koffloaderAgent.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      failureThreshold: 60
+      ## @param koffloaderAgent.httpServer.startupProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      periodSeconds: 2
+
+    livenessProbe:
+      ## @param koffloaderAgent.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      failureThreshold: 6
+      ## @param koffloaderAgent.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      periodSeconds: 10
+
+    readinessProbe:
+      ## @param koffloaderAgent.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for koffloaderAgent health checking
+      failureThreshold: 3
+      ## @param koffloaderAgent.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for koffloaderAgent health checking
+      periodSeconds: 10
+
+  prometheus:
+    ## @param koffloaderAgent.prometheus.enabled enable template agent to collect metrics
+    enabled: false
+
+    ## @param koffloaderAgent.prometheus.port the metrics port of template agent
+    port: 5711
+
+    serviceMonitor:
+      ## @param koffloaderAgent.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderAgent.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderAgent.prometheus.serviceMonitor.annotations the additional annotations of koffloaderAgent serviceMonitor
+      annotations: {}
+
+      ## @param koffloaderAgent.prometheus.serviceMonitor.labels the additional label of koffloaderAgent serviceMonitor
+      labels: {}
+
+    prometheusRule:
+      ## @param koffloaderAgent.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderAgent.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderAgent.prometheus.prometheusRule.annotations the additional annotations of koffloaderAgent prometheusRule
+      annotations: {}
+
+      ## @param koffloaderAgent.prometheus.prometheusRule.labels the additional label of koffloaderAgent prometheusRule
+      labels: {}
+
+    grafanaDashboard:
+      ## @param koffloaderAgent.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderAgent.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderAgent.prometheus.grafanaDashboard.annotations the additional annotations of koffloaderAgent grafanaDashboard
+      annotations: {}
+
+      ## @param koffloaderAgent.prometheus.grafanaDashboard.labels the additional label of koffloaderAgent grafanaDashboard
+      labels: {}
+
+  debug:
+    ## @param koffloaderAgent.debug.logLevel the log level of template agent [debug, info, warn, error, fatal, panic]
+    logLevel: "info"
+    ## @param koffloaderAgent.debug.gopsPort the gops port of template agent
+    gopsPort: 5712
+
+## @section koffloaderController parameters
+##
+koffloaderController:
+  ## @param koffloaderController.name the koffloaderController name
+  name: "koffloader-controller"
+
+  ## @param koffloaderController.replicas the replicas number of koffloaderController pod
+  replicas: 1
+
+  ## @param koffloaderController.binName the binName name of koffloaderController
+  cmdBinName: "/usr/bin/controller"
+
+  ## @param koffloaderController.hostnetwork enable hostnetwork mode of koffloaderController pod. Notice, if no CNI available before template installation, must enable this
+  hostnetwork: false
+
+  image:
+    ## @param koffloaderController.image.registry the image registry of koffloaderController
+    registry: ghcr.io
+
+    ## @param koffloaderController.image.repository the image repository of koffloaderController
+    repository: koffloader-io/koffloader-controller
+
+    ## @param koffloaderController.image.pullPolicy the image pullPolicy of koffloaderController
+    pullPolicy: IfNotPresent
+
+    ## @param koffloaderController.image.digest the image digest of koffloaderController, which takes preference over tag
+    digest: ""
+
+    ## @param koffloaderController.image.tag the image tag of koffloaderController, overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+    ## @param koffloaderController.image.imagePullSecrets the image imagePullSecrets of koffloaderController
+    imagePullSecrets: []
+    # - name: "image-pull-secret"
+
+  ## @skip koffloaderController.nodeSelector.kubernetes.io/os
+  nodeSelector:
+    kubernetes.io/os: linux
+
+  serviceAccount:
+    ## @param koffloaderController.serviceAccount.create create the service account for the koffloaderController
+    create: true
+    ## @param koffloaderController.serviceAccount.annotations the annotations of koffloaderController service account
+    annotations: {}
+
+  service:
+    ## @param koffloaderController.service.annotations the annotations for koffloaderController service
+    annotations: {}
+    ## @param koffloaderController.service.type the type for koffloaderController service
+    type: ClusterIP
+
+  ## @skip koffloaderController.tolerations
+  tolerations:
+    - operator: Exists
+
+  ## @param koffloaderController.priorityClassName the priority Class Name for koffloaderController
+  priorityClassName: "system-node-critical"
+
+  ## @param koffloaderController.affinity the affinity of koffloaderController
+  affinity: {}
+
+  ## @param koffloaderController.extraArgs the additional arguments of koffloaderController container
+  extraArgs: []
+
+  ## @param koffloaderController.extraEnv the additional environment variables of koffloaderController container
+  extraEnv: []
+
+  ## @param koffloaderController.extraVolumes the additional volumes of koffloaderController container
+  extraVolumes: []
+    # - name: test-val
+  #   mountPath: /host/tmp
+
+  ## @param koffloaderController.extraVolumeMounts the additional hostPath mounts of koffloaderController container
+  extraVolumeMounts: []
+    # - name: test-val
+  #   mountPath: /tmp
+
+  ## @param koffloaderController.podAnnotations the additional annotations of koffloaderController pod
+  podAnnotations: {}
+  # test: 100
+
+  ## @param koffloaderController.podLabels the additional label of koffloaderController pod
+  podLabels: {}
+
+  ## @param koffloaderController.securityContext the security Context of koffloaderController pod
+  securityContext: {}
+  # runAsUser: 0
+
+  resources:
+    ## @param koffloaderController.resources.limits.cpu the cpu limit of koffloaderController pod
+    ## @param koffloaderController.resources.limits.memory the memory limit of koffloaderController pod
+    ## @param koffloaderController.resources.requests.cpu the cpu requests of koffloaderController pod
+    ## @param koffloaderController.resources.requests.memory the memory requests of koffloaderController pod
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  podDisruptionBudget:
+    ## @param koffloaderController.podDisruptionBudget.enabled enable podDisruptionBudget for koffloaderController pod
+    enabled: false
+
+    ## @param koffloaderController.podDisruptionBudget.minAvailable minimum number/percentage of pods that should remain scheduled.
+    minAvailable: 1
+
+  httpServer:
+    ## @param koffloaderController.port the http Port for koffloaderController, for health checking and http service
+    port: 5720
+
+    startupProbe:
+      ## @param koffloaderController.httpServer.startupProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      failureThreshold: 30
+
+      ## @param koffloaderController.httpServer.startupProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      periodSeconds: 2
+
+    livenessProbe:
+      ## @param koffloaderController.httpServer.livenessProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      failureThreshold: 6
+
+      ## @param koffloaderController.httpServer.livenessProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      periodSeconds: 10
+
+    readinessProbe:
+      ## @param koffloaderController.httpServer.readinessProbe.failureThreshold the failure threshold of startup probe for koffloaderController health checking
+      failureThreshold: 3
+
+      ## @param koffloaderController.httpServer.readinessProbe.periodSeconds the period seconds of startup probe for koffloaderController health checking
+      periodSeconds: 10
+
+  ## @param koffloaderController.webhookPort the http port for koffloaderController webhook
+  webhookPort: 5722
+
+  prometheus:
+    ## @param koffloaderController.prometheus.enabled enable template Controller to collect metrics
+    enabled: false
+
+    ## @param koffloaderController.prometheus.port the metrics port of template Controller
+    port: 5721
+
+    serviceMonitor:
+      ## @param koffloaderController.prometheus.serviceMonitor.install install serviceMonitor for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderController.prometheus.serviceMonitor.namespace the serviceMonitor namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderController.prometheus.serviceMonitor.annotations the additional annotations of koffloaderController serviceMonitor
+      annotations: {}
+
+      ## @param koffloaderController.prometheus.serviceMonitor.labels the additional label of koffloaderController serviceMonitor
+      labels: {}
+
+    prometheusRule:
+      ## @param koffloaderController.prometheus.prometheusRule.install install prometheusRule for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderController.prometheus.prometheusRule.namespace the prometheusRule namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderController.prometheus.prometheusRule.annotations the additional annotations of koffloaderController prometheusRule
+      annotations: {}
+
+      ## @param koffloaderController.prometheus.prometheusRule.labels the additional label of koffloaderController prometheusRule
+      labels: {}
+
+    grafanaDashboard:
+      ## @param koffloaderController.prometheus.grafanaDashboard.install install grafanaDashboard for template agent. This requires the prometheus CRDs to be available
+      install: false
+
+      ## @param koffloaderController.prometheus.grafanaDashboard.namespace the grafanaDashboard namespace. Default to the namespace of helm instance
+      namespace: ""
+
+      ## @param koffloaderController.prometheus.grafanaDashboard.annotations the additional annotations of koffloaderController grafanaDashboard
+      annotations: {}
+
+      ## @param koffloaderController.prometheus.grafanaDashboard.labels the additional label of koffloaderController grafanaDashboard
+      labels: {}
+
+  debug:
+    ## @param koffloaderController.debug.logLevel the log level of template Controller [debug, info, warn, error, fatal, panic]
+    logLevel: "info"
+
+    ## @param koffloaderController.debug.gopsPort the gops port of template Controller
+    gopsPort: 5724
+
+  ## TLS configuration for webhook
+  tls:
+    ## @param koffloaderController.tls.method the method for generating TLS certificates. [ provided , certmanager , auto]
+    ## - provided:     provide all certificates by helm options
+    ## - certmanager:  This method use cert-manager to generate & rotate certificates.
+    ## - auto:         Auto generate cert.
+    method: auto
+
+    ## @param koffloaderController.tls.secretName the secret name for storing TLS certificates
+    secretName: "template-controller-server-certs"
+
+    ## for certmanager method
+    certmanager:
+      ## @param koffloaderController.tls.certmanager.certValidityDuration generated certificates validity duration in days for 'certmanager' method
+      certValidityDuration: 365
+
+      ## @param koffloaderController.tls.certmanager.issuerName issuer name of cert manager 'certmanager'. If not specified, a CA issuer will be created.
+      issuerName: ""
+
+      ## @param koffloaderController.tls.certmanager.extraDnsNames extra DNS names added to certificate when it's auto generated
+      extraDnsNames: []
+
+      ## @param koffloaderController.tls.certmanager.extraIPAddresses extra IP addresses added to certificate when it's auto generated
+      extraIPAddresses: []
+
+    ## for provided method
+    provided:
+      ## @param koffloaderController.tls.provided.tlsCert encoded tls certificate for provided method
+      ## @param koffloaderController.tls.provided.tlsKey encoded tls key for provided method
+      ## @param koffloaderController.tls.provided.tlsCa encoded tls CA for provided method
+      tlsCert: ""
+      tlsKey: ""
+      tlsCa: ""
+
+    ## for auto method
+    auto:
+      ## @param koffloaderController.tls.auto.caExpiration ca expiration for auto method
+      # in day , default 200 years
+      caExpiration: '73000'
+
+      ## @param koffloaderController.tls.auto.certExpiration server cert expiration for auto method
+      # in day, default 200 years
+      certExpiration: '73000'
+
+      ## @param koffloaderController.tls.auto.extraIpAddresses extra IP addresses of server certificate for auto method
+      extraIpAddresses: []
+
+      ## @param koffloaderController.tls.auto.extraDnsNames extra DNS names of server cert for auto method
+      extraDnsNames: []

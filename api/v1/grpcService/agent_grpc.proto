@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+// ====modify==== 把如下字符串中的 grpcService 和 本文件的目录名对齐 ！！！
+option go_package = ".;grpcService";
+
+package proto;
+
+message ExecRequestMsg {
+  string command = 1;
+  uint64 timeoutsecond = 2;
+}
+
+message ExecResponseMsg {
+  string stdmsg = 1;
+  string stderr = 2;
+  int32 code = 3;
+}
+
+service CmdService {
+  // execute a remote command
+  rpc ExecRemoteCmd( stream ExecRequestMsg ) returns ( stream ExecResponseMsg) {}
+}
+

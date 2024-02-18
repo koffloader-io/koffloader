@@ -1,0 +1,56 @@
+{{- if .Values.koffloaderAgent.prometheus.grafanaDashboard.install -}}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.koffloaderAgent.prometheus.grafanaDashboard.namespace }}
+  labels:
+    {{- include "project.koffloaderAgent.labels" . | nindent 4 }}
+    {{- if .Values.global.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.koffloaderAgent.prometheus.grafanaDashboard.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.grafanaDashboard.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.global.commonAnnotations .Values.koffloaderAgent.prometheus.grafanaDashboard.annotations }}
+  annotations:
+    {{- if .Values.global.commonAnnotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.koffloaderAgent.prometheus.grafanaDashboard.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.prometheus.grafanaDashboard.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  json: |-
+    {}
+{{- end }}
+
+---
+{{- if .Values.koffloaderController.prometheus.grafanaDashboard.install -}}
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ default .Release.Namespace .Values.koffloaderController.prometheus.grafanaDashboard.namespace }}
+  labels:
+    {{- include "project.koffloaderController.labels" . | nindent 4 }}
+    {{- if .Values.global.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.koffloaderController.prometheus.grafanaDashboard.labels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.grafanaDashboard.labels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.global.commonAnnotations .Values.koffloaderController.prometheus.grafanaDashboard.annotations }}
+  annotations:
+    {{- if .Values.global.commonAnnotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.koffloaderController.prometheus.grafanaDashboard.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.prometheus.grafanaDashboard.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  json: |-
+    {}
+  {{- end }}

@@ -1,0 +1,186 @@
+apiVersion: {{ include "capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "project.koffloaderController.labels" . | nindent 4 }}
+      {{- if .Values.global.commonLabels }}
+      {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
+      {{- end }}
+  {{- if .Values.global.commonAnnotations }}
+  annotations:
+    {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.koffloaderController.replicas }}
+  selector:
+    matchLabels:
+      {{- include "project.koffloaderController.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if or .Values.koffloaderController.podAnnotations .Values.global.commonAnnotations }}
+      annotations:
+        {{- if .Values.global.commonAnnotations }}
+        {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.koffloaderController.podAnnotations }}
+        {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.podAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- end }}
+      labels:
+        {{- include "project.koffloaderController.selectorLabels" . | nindent 8 }}
+        {{- if .Values.global.commonLabels }}
+        {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- if .Values.koffloaderController.podLabels }}
+        {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.podLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.koffloaderController.image.imagePullSecrets }}
+      imagePullSecrets:
+      {{- with .Values.koffloaderController.image.imagePullSecrets }}
+      {{- toYaml . | trim | nindent 6 }}
+      {{- end }}
+      {{- end }}
+      serviceAccountName: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+      priorityClassName: {{ default "system-node-critical" .Values.koffloaderController.priorityClassName }}
+      {{- if .Values.koffloaderController.hostnetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- else }}
+      hostNetwork: false
+      dnsPolicy: ClusterFirst
+      {{- end }}
+      restartPolicy: Always
+      {{- with .Values.koffloaderController.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.koffloaderController.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.koffloaderController.affinity }}
+      affinity:
+      {{- include "tplvalues.render" (dict "value" .Values.koffloaderController.affinity "context" $) | nindent 6 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+          image: {{ include "project.koffloaderController.image" . | quote }}
+          imagePullPolicy: {{ .Values.koffloaderController.image.pullPolicy }}
+          command:
+            - {{ .Values.koffloaderController.cmdBinName }}
+          args:
+            - --config-path=/tmp/config-map/conf.yml
+            - --tls-ca-cert=/etc/tls/ca.crt
+            - --tls-server-cert=/etc/tls/tls.crt
+            - --tls-server-key=/etc/tls/tls.key
+          {{- with .Values.koffloaderController.extraArgs }}
+          {{- toYaml . | trim | nindent 8 }}
+          {{- end }}
+          ports:
+          {{- if .Values.koffloaderController.prometheus.enabled }}
+          - name: metrics
+            containerPort: {{ .Values.koffloaderController.prometheus.port }}
+            protocol: TCP
+          {{- end }}
+          - name: http
+            containerPort: {{ .Values.koffloaderController.httpServer.port }}
+            protocol: TCP
+          - name: webhook
+            containerPort: {{ .Values.koffloaderController.webhookPort }}
+            protocol: TCP
+          {{- if semverCompare ">=1.20-0" .Capabilities.KubeVersion.Version }}
+          startupProbe:
+            httpGet:
+              path: /healthy/startup
+              port: {{ .Values.koffloaderController.httpServer.port }}
+              scheme: HTTP
+            failureThreshold: {{ .Values.koffloaderController.httpServer.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.koffloaderController.httpServer.startupProbe.periodSeconds }}
+            successThreshold: 1
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthy/liveness
+              port: {{ .Values.koffloaderController.httpServer.port }}
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: {{ .Values.koffloaderController.httpServer.livenessProbe.periodSeconds }}
+            successThreshold: 1
+            failureThreshold: {{ .Values.koffloaderController.httpServer.livenessProbe.failureThreshold }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthy/readiness
+              port: {{ .Values.koffloaderController.httpServer.port }}
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: {{ .Values.koffloaderController.httpServer.readinessProbe.periodSeconds }}
+            successThreshold: 1
+            failureThreshold: {{ .Values.koffloaderController.httpServer.readinessProbe.failureThreshold }}
+            timeoutSeconds: 5
+          {{- with .Values.koffloaderController.resources }}
+          resources:
+          {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          env:
+            - name: ENV_LOG_LEVEL
+              value: {{ .Values.koffloaderController.debug.logLevel | quote }}
+            - name: ENV_ENABLED_METRIC
+              value: {{ .Values.koffloaderController.prometheus.enabled | quote }}
+            - name: ENV_METRIC_HTTP_PORT
+              value: {{ .Values.koffloaderController.prometheus.port | quote }}
+            - name: ENV_GOPS_LISTEN_PORT
+              value: {{ .Values.koffloaderController.debug.gopsPort | quote }}
+            - name: ENV_WEBHOOK_PORT
+              value: {{ .Values.koffloaderController.webhookPort | quote }}
+            - name: ENV_HTTP_PORT
+              value: {{ .Values.koffloaderController.httpServer.port | quote }}
+            - name: ENV_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ENV_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.koffloaderController.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.koffloaderController.securityContext }}
+          securityContext:
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          volumeMounts:
+            - name: config-path
+              mountPath: /tmp/config-map
+              readOnly: true
+            - name: tls
+              mountPath: /etc/tls
+              readOnly: true
+            {{- if .Values.koffloaderController.extraVolumes }}
+            {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.extraVolumeMounts "context" $ ) | nindent 12 }}
+            {{- end }}
+      volumes:
+        # To read the configuration from the config map
+        - name: config-path
+          configMap:
+            name: {{ .Values.global.configName }}
+        - name: tls
+          projected:
+            defaultMode: 0400
+            sources:
+              - secret:
+                  name: {{ .Values.koffloaderController.tls.secretName | trunc 63 | trimSuffix "-" }}
+                  items:
+                    - key: tls.crt
+                      path: tls.crt
+                    - key: tls.key
+                      path: tls.key
+                    - key: ca.crt
+                      path: ca.crt
+      {{- if .Values.koffloaderController.extraVolumeMounts }}
+      {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.extraVolumeMounts "context" $ ) | nindent 6 }}
+      {{- end }}
