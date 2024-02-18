@@ -37,7 +37,7 @@ func (s *informerHandler) syncHandler(ctx context.Context, obj *crd.Kcluster) er
 	newone.Status.TotalIPCount = 100
 
 	if !reflect.DeepEqual(old, newone) {
-		if _, err := s.k8sclient.koffloaderV1().Kclusters().UpdateStatus(ctx, newone, metav1.UpdateOptions{}); err != nil {
+		if _, err := s.k8sclient.KoffloaderV1().Kclusters().UpdateStatus(ctx, newone, metav1.UpdateOptions{}); err != nil {
 			// if conflicted, queue will retry it later
 			return err
 		}

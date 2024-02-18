@@ -166,7 +166,7 @@ func (s *informerHandler) executeInformer() {
 	factory := externalversions.NewSharedInformerFactory(clientset, 0)
 	// 注意，一个 factory 下  对同一种 CRD 不能 创建 多个Informer，不然会 数据竞争 问题。 而 一个 factory 下， 可对不同 CRD 产生 各种的 Informer
 
-	t := factory.koffloader().V1().Kclusters()
+	t := factory.Koffloader().V1().Kclusters()
 	s.crdlister = t.Lister()
 
 	inform := t.Informer()
