@@ -59,7 +59,7 @@ rules:
   - get
   - update
 - apiGroups:
-  - rocktemplate.spidernet.io
+  - koffloader.koffloader.io
   resources:
   - mybooks
   verbs:
@@ -71,7 +71,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - rocktemplate.spidernet.io
+  - koffloader.koffloader.io
   resources:
   - mybooks/status
   verbs:

@@ -1,65 +1,65 @@
-{{- if .Values.rocktemplateAgent.prometheus.enabled }}
+{{- if .Values.koffloaderAgent.prometheus.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.rocktemplateAgent.name | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.koffloaderAgent.name | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace | quote }}
-  {{- if or .Values.global.commonAnnotations .Values.rocktemplateAgent.service.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.koffloaderAgent.service.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.rocktemplateAgent.service.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateAgent.service.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.koffloaderAgent.service.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderAgent.service.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
   labels:
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- include "project.rocktemplateAgent.labels" . | nindent 4 }}
+    {{- include "project.koffloaderAgent.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.rocktemplateAgent.service.type }}
+  type: {{ .Values.koffloaderAgent.service.type }}
   ports:
     - name: metrics
-      port: {{ .Values.rocktemplateAgent.prometheus.port }}
+      port: {{ .Values.koffloaderAgent.prometheus.port }}
       targetPort: metrics
       protocol: TCP
   selector:
-    {{- include "project.rocktemplateAgent.selectorLabels" . | nindent 4 }}
+    {{- include "project.koffloaderAgent.selectorLabels" . | nindent 4 }}
 {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.rocktemplateController.name | trunc 63 | trimSuffix "-" }}
+  name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
   namespace: {{ .Release.Namespace | quote }}
-  {{- if or .Values.global.commonAnnotations .Values.rocktemplateController.service.annotations }}
+  {{- if or .Values.global.commonAnnotations .Values.koffloaderController.service.annotations }}
   annotations:
     {{- if .Values.global.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonAnnotations "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- if .Values.rocktemplateController.service.annotations }}
-    {{- include "tplvalues.render" ( dict "value" .Values.rocktemplateController.service.annotations "context" $ ) | nindent 4 }}
+    {{- if .Values.koffloaderController.service.annotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.koffloaderController.service.annotations "context" $ ) | nindent 4 }}
     {{- end }}
   {{- end }}
   labels:
     {{- if .Values.global.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.global.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
-    {{- include "project.rocktemplateController.labels" . | nindent 4 }}
+    {{- include "project.koffloaderController.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.rocktemplateController.service.type }}
+  type: {{ .Values.koffloaderController.service.type }}
   ports:
-    {{- if .Values.rocktemplateController.prometheus.enabled }}
+    {{- if .Values.koffloaderController.prometheus.enabled }}
     - name: metrics
-      port: {{ .Values.rocktemplateController.prometheus.port }}
+      port: {{ .Values.koffloaderController.prometheus.port }}
       targetPort: metrics
       protocol: TCP
     {{- end }}
     - name: webhook
-      port: {{ .Values.rocktemplateController.webhookPort }}
+      port: {{ .Values.koffloaderController.webhookPort }}
       targetPort: webhook
       protocol: TCP
   selector:
-    {{- include "project.rocktemplateController.selectorLabels" . | nindent 4 }}
+    {{- include "project.koffloaderController.selectorLabels" . | nindent 4 }}

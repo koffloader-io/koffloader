@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       repo:
-        description: 'github project, like "https://github.com/spidernet-io/spiderpool" '
+        description: 'github project, like "https://github.com/koffloader-io/spiderpool" '
         required: false
 
 permissions: write-all

@@ -2,28 +2,28 @@
 
 ## copy
 
-1. copy repo `cp -rf rocktemplate/*  YourRepoName  && cp rocktemplate/.gitignore YourRepoName  && cp rocktemplate/.github  YourRepoName `
+1. copy repo `cp -rf koffloader/*  YourRepoName  && cp koffloader/.gitignore YourRepoName  && cp koffloader/.github  YourRepoName `
 
-   replace all 'rocktemplate' to 'YourRepoName'
+   replace all 'koffloader' to 'YourRepoName'
 
-   replace all 'spidernet-io' and 'spidernet.io' to 'YourOrigin'
+   replace all 'koffloader-io' and 'koffloader.io' to 'YourOrigin'
 
-   replace all 'Copyright 2022' to be the right time
+   replace all 'Copyright 2024' to be the right time
 
 2. grep "====modify====" * -RHn --colour  and modify all of them
 
 3. in a linux machine, update api/v1/openapi.yaml and `make update_openapi_sdk`
 
 4. redefine CRD in pkg/k8s/v1
-    rename directory name 'pkg/k8s/apis/rocktemplate.spidernet.io' 
+    rename directory name 'pkg/k8s/apis/koffloader.koffloader.io' 
     replace all 'mybook' to 'YourCRDName'
     and `make update_crd_sdk`, and write code in pkg/mybookManager
 
     rename pkg/mybookManager and replace all 'mybook' with your CRD name in this directory
 
-    rm charts/crds/rocktemplate.spidernet.io_mybooks.yaml 
+    rm charts/crds/koffloader.koffloader.io_mybooks.yaml 
 
-    # in repo: replace all "github.com/spidernet-io/spiderdoctor/pkg/mybookManager" to "github.com/spidernet-io/spiderdoctor/pkg/${crdName}Manager"
+    # in repo: replace all "github.com/koffloader-io/spiderdoctor/pkg/mybookManager" to "github.com/koffloader-io/spiderdoctor/pkg/${crdName}Manager"
     # in repo: find and replace all "mybook" to YourCrd
 
 5. update charts/ , and images/ , and CODEOWNERS
@@ -45,16 +45,16 @@
    codecov: https://github.com/marketplace/codecov  and https://app.codecov.io/gh
 
 10. github seetings:
-      spidernet.io/REPO  -> settings -> secrets and variable -> actions -> add secret 'WELAN_PAT' , 'ACTIONS_RUNNER_DEBUG'=true , 'ACTIONS_STEP_DEBUG'=true, 'CODECOV_TOKEN'
+      koffloader.io/REPO  -> settings -> secrets and variable -> actions -> add secret 'WELAN_PAT' , 'ACTIONS_RUNNER_DEBUG'=true , 'ACTIONS_STEP_DEBUG'=true, 'CODECOV_TOKEN'
 
-      spidernet.io  -> settings -> secrets -> actions -> grant secret to repo
+      koffloader.io  -> settings -> secrets -> actions -> grant secret to repo
 
-      spidernet.io/REPO  -> settings -> general -> feature -> issue
+      koffloader.io/REPO  -> settings -> general -> feature -> issue
 
-      spidernet.io/ORG  -> settings -> actions -> general -> allow github action to create pr
-      spidernet.io/REPO  -> settings -> actions -> general -> allow github action to create pr
+      koffloader.io/ORG  -> settings -> actions -> general -> allow github action to create pr
+      koffloader.io/REPO  -> settings -> actions -> general -> allow github action to create pr
 
-      spidernet.io  -> settings -> packages -> public 
+      koffloader.io  -> settings -> packages -> public 
 
       repo -> packages -> package settings -> Change package visibility
 
@@ -99,7 +99,7 @@
 5. apply cr
 
         cat <<EOF > mybook.yaml
-        apiVersion: rocktemplate.spidernet.io/v1
+        apiVersion: koffloader.koffloader.io/v1
         kind: Mybook
         metadata:
           name: test
@@ -111,7 +111,7 @@
 
 ## chart develop
 
-helm repo add rock https://spidernet-io.github.io/rocktemplate/
+helm repo add rock https://koffloader-io.github.io/koffloader/
 
 ## upgrade project 
 

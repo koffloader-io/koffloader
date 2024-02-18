@@ -1,15 +1,15 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
 	"context"
-	"github.com/spidernet-io/rocktemplate/api/v1/grpcService"
-	"github.com/spidernet-io/rocktemplate/pkg/debug"
-	"github.com/spidernet-io/rocktemplate/pkg/grpcManager"
-	"github.com/spidernet-io/rocktemplate/pkg/types"
-	"github.com/spidernet-io/rocktemplate/pkg/utils"
+	"github.com/koffloader-io/koffloader/api/v1/grpcService"
+	"github.com/koffloader-io/koffloader/pkg/debug"
+	"github.com/koffloader-io/koffloader/pkg/grpcManager"
+	"github.com/koffloader-io/koffloader/pkg/types"
+	"github.com/koffloader-io/koffloader/pkg/utils"
 	"time"
 )
 

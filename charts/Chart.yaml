@@ -1,6 +1,6 @@
 apiVersion: v2
-name: rocktemplate
-home: "https://github.com/spidernet-io/rocktemplate"
+name: koffloader
+home: "https://github.com/koffloader-io/koffloader"
 # application or library
 type: application
 # no need to modify this version , CI will auto update it with /VERSION
@@ -10,11 +10,11 @@ version: 0.1.0
 # no need to modify this version , CI will auto update it with /VERSION
 appVersion: "0.1.0"
 kubeVersion: ">= 1.16.0-0"
-description: rocktemplate
+description: koffloader
 sources:
-  - "https://github.com/spidernet-io/rocktemplate"
+  - "https://github.com/koffloader-io/koffloader"
 keywords:
-  - rocktemplate
+  - koffloader
 maintainers:
-  - name: spidernet-io
-    url: https://github.com/spidernet-io
+  - name: koffloader-io
+    url: https://github.com/koffloader-io

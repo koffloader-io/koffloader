@@ -1,13 +1,13 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
+	"github.com/koffloader-io/koffloader/pkg/logger"
+	"github.com/koffloader-io/koffloader/pkg/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/spidernet-io/rocktemplate/pkg/logger"
-	"github.com/spidernet-io/rocktemplate/pkg/types"
 	"gopkg.in/yaml.v3"
 	"os"
 	"reflect"

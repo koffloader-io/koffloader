@@ -5,12 +5,12 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
-  name: mybooks.rocktemplate.spidernet.io
+  name: mybooks.koffloader.koffloader.io
 spec:
-  group: rocktemplate.spidernet.io
+  group: koffloader.koffloader.io
   names:
     categories:
-    - rocktemplate
+    - koffloader
     kind: Mybook
     listKind: MybookList
     plural: mybooks

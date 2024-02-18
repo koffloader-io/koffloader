@@ -1,4 +1,4 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 // !!!!!! crd marker:
@@ -49,7 +49,7 @@ type MybookStatus struct {
 }
 
 // scope(Namespaced or Cluster)
-// +kubebuilder:resource:categories={rocktemplate},path="mybooks",singular="mybook",scope="Cluster",shortName={mb}
+// +kubebuilder:resource:categories={koffloader},path="mybooks",singular="mybook",scope="Cluster",shortName={mb}
 // +kubebuilder:printcolumn:JSONPath=".spec.ipVersion",description="ipVersion",name="VERSION",type=string
 // +kubebuilder:printcolumn:JSONPath=".spec.subnet",description="subnet",name="SUBNET",type=string
 // +kubebuilder:printcolumn:JSONPath=".status.totalIPCount",description="totalIPCount",name="TOTAL-IP-COUNT",type=integer

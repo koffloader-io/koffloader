@@ -1,4 +1,4 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package mybookManager
@@ -6,12 +6,12 @@ package mybookManager
 import (
 	"context"
 	"fmt"
-	"github.com/spidernet-io/rocktemplate/pkg/k8s"
-	crd "github.com/spidernet-io/rocktemplate/pkg/k8s/apis/rocktemplate.spidernet.io/v1"
-	crdclientset "github.com/spidernet-io/rocktemplate/pkg/k8s/client/clientset/versioned"
-	"github.com/spidernet-io/rocktemplate/pkg/k8s/client/informers/externalversions"
-	crdlisterv1 "github.com/spidernet-io/rocktemplate/pkg/k8s/client/listers/rocktemplate.spidernet.io/v1"
-	"github.com/spidernet-io/rocktemplate/pkg/lease"
+	"github.com/koffloader-io/koffloader/pkg/k8s"
+	crd "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
+	crdclientset "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned"
+	"github.com/koffloader-io/koffloader/pkg/k8s/client/informers/externalversions"
+	crdlisterv1 "github.com/koffloader-io/koffloader/pkg/k8s/client/listers/koffloader.koffloader.io/v1"
+	"github.com/koffloader-io/koffloader/pkg/lease"
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -166,7 +166,7 @@ func (s *informerHandler) executeInformer() {
 	factory := externalversions.NewSharedInformerFactory(clientset, 0)
 	// 注意，一个 factory 下  对同一种 CRD 不能 创建 多个Informer，不然会 数据竞争 问题。 而 一个 factory 下， 可对不同 CRD 产生 各种的 Informer
 
-	t := factory.Rocktemplate().V1().Mybooks()
+	t := factory.koffloader().V1().Mybooks()
 	s.crdlister = t.Lister()
 
 	inform := t.Informer()

@@ -1,6 +1,6 @@
 # docker buildx build -t testbase:latest --platform=linux/arm64,linux/amd64 --output type=docker .
 
-# Copyright 2022 Authors of spidernet-io
+# Copyright 2024 Authors of koffloader-io
 # SPDX-License-Identifier: Apache-2.0
 
 ARG GOLANG_IMAGE=docker.io/library/golang:1.21.7
@@ -44,5 +44,5 @@ RUN chmod +x /install-others.sh && /install-others.sh ${TARGETARCH} && rm -f /in
 
 #============
 FROM scratch
-LABEL maintainer="maintainer@spidernet-io"
+LABEL maintainer="maintainer@koffloader-io"
 COPY --from=rootfs / /

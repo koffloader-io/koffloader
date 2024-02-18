@@ -50,7 +50,7 @@ jobs:
         uses: dacbd/create-issue-action@v1.2.1
         with:
           token: ${{ secrets.WELAN_PAT }}
-          #owner: spidernet-io
+          #owner: koffloader-io
           #repo: rocktemplae
           title: "Night CI ${{ ENV.TIMESTAMP }}: Failed"
           body: |

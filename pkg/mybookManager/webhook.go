@@ -1,4 +1,4 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package mybookManager
@@ -6,7 +6,7 @@ package mybookManager
 import (
 	"context"
 	"fmt"
-	crd "github.com/spidernet-io/rocktemplate/pkg/k8s/apis/rocktemplate.spidernet.io/v1"
+	crd "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
 	"go.uber.org/zap"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -38,7 +38,7 @@ func (s *webhookhander) Default(ctx context.Context, obj runtime.Object) error {
 	logger.Sugar().Infof("obj: %+v", r)
 	r.Annotations["test"] = "add-by-mutating-webhook"
 
-	finalizerName := "rocktemplate.spidernet.io"
+	finalizerName := "koffloader.koffloader.io"
 	if dt := r.GetDeletionTimestamp(); dt.IsZero() && !controllerutil.ContainsFinalizer(client.Object(r), finalizerName) {
 		controllerutil.AddFinalizer(client.Object(r), finalizerName)
 	}

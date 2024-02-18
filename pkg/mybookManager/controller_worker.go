@@ -1,11 +1,11 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package mybookManager
 
 import (
 	"context"
-	crd "github.com/spidernet-io/rocktemplate/pkg/k8s/apis/rocktemplate.spidernet.io/v1"
+	crd "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,7 +19,7 @@ func (s *informerHandler) syncHandler(ctx context.Context, obj *crd.Mybook) erro
 	logger := s.logger.Named("worker")
 
 	// 通过 clientset 向 api server 实时获取最新数据
-	// old, err := s.k8sclient.RocktemplateV1().Mybooks().Get(ctx, obj.Name, metav1.GetOptions{})
+	// old, err := s.k8sclient.koffloaderV1().Mybooks().Get(ctx, obj.Name, metav1.GetOptions{})
 	// 获取最新cache中的数据（cache中的数据有延时风险）
 	old, err := s.crdlister.Get(obj.Name)
 	if err != nil {
@@ -37,7 +37,7 @@ func (s *informerHandler) syncHandler(ctx context.Context, obj *crd.Mybook) erro
 	newone.Status.TotalIPCount = 100
 
 	if !reflect.DeepEqual(old, newone) {
-		if _, err := s.k8sclient.RocktemplateV1().Mybooks().UpdateStatus(ctx, newone, metav1.UpdateOptions{}); err != nil {
+		if _, err := s.k8sclient.koffloaderV1().Mybooks().UpdateStatus(ctx, newone, metav1.UpdateOptions{}); err != nil {
 			// if conflicted, queue will retry it later
 			return err
 		}

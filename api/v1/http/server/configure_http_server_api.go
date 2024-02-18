@@ -1,6 +1,6 @@
 // This file is safe to edit. Once it exists it will not be overwritten
 
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package server
@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/spidernet-io/rocktemplate/api/v1/http/server/restapi"
-	"github.com/spidernet-io/rocktemplate/api/v1/http/server/restapi/healthy"
+	"github.com/koffloader-io/koffloader/api/v1/http/server/restapi"
+	"github.com/koffloader-io/koffloader/api/v1/http/server/restapi/healthy"
 )
 
 //go:generate swagger generate server --target ../../http --name HTTPServerAPI --spec ../openapi.yaml --api-package restapi --server-package server --principal interface{} --default-scheme unix --exclude-main

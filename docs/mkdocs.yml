@@ -1,8 +1,8 @@
-site_name: rocktemplate
+site_name: koffloader
 docs_dir: docs
 site_dir: site
-repo_name: spidernet-io/rocktemplate
-repo_url: https://github.com/spidernet-io/rocktemplate
+repo_name: koffloader-io/koffloader
+repo_url: https://github.com/koffloader-io/koffloader
 # remote branch for mkdocs gh-deploy
 remote_branch: github_pages
 theme:

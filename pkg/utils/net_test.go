@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright Authors of spidernet-io
+// Copyright Authors of koffloader-io
 
 package utils_test
 
@@ -7,7 +7,7 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/spidernet-io/rocktemplate/pkg/utils"
+	"github.com/koffloader-io/koffloader/pkg/utils"
 	"net"
 )
 

@@ -1,8 +1,8 @@
-# Copyright 2022 Authors of spidernet-io
+# Copyright 2024 Authors of koffloader-io
 # SPDX-License-Identifier: Apache-2.0
 
 # ====modify====
-ARG BASE_IMAGE=ghcr.io/spidernet-io/rocktemplate-controller-base:da74ed75a6af16ab18dd2095963dc82244c94177
+ARG BASE_IMAGE=ghcr.io/koffloader-io/koffloader-controller-base:da74ed75a6af16ab18dd2095963dc82244c94177
 ARG GOLANG_IMAGE=docker.io/library/golang:1.21.7
 
 #======= build bin ==========
@@ -31,7 +31,7 @@ RUN  make GOARCH=${TARGETARCH}   \
 
 FROM --platform=${TARGETPLATFORM} ${BASE_IMAGE}
 
-LABEL maintainer="maintainer@spidernet-io"
+LABEL maintainer="maintainer@koffloader-io"
 
 # TARGETOS is an automatic platform ARG enabled by Docker BuildKit.
 ARG TARGETOS

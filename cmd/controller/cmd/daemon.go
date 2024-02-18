@@ -1,13 +1,13 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
 	"context"
-	"github.com/spidernet-io/rocktemplate/pkg/debug"
-	"github.com/spidernet-io/rocktemplate/pkg/mybookManager"
-	"github.com/spidernet-io/rocktemplate/pkg/types"
+	"github.com/koffloader-io/koffloader/pkg/debug"
+	"github.com/koffloader-io/koffloader/pkg/mybookManager"
+	"github.com/koffloader-io/koffloader/pkg/types"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"path/filepath"

@@ -1,11 +1,11 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 
 package cmd
 
 import (
-	pkgmetric "github.com/spidernet-io/rocktemplate/pkg/metrics"
-	"github.com/spidernet-io/rocktemplate/pkg/types"
+	pkgmetric "github.com/koffloader-io/koffloader/pkg/metrics"
+	"github.com/koffloader-io/koffloader/pkg/types"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
 	api "go.opentelemetry.io/otel/metric"

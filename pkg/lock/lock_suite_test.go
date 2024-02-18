@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright Authors of spidernet-io
+// Copyright Authors of koffloader-io
 
 package lock_test
 

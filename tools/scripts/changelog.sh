@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2022 Authors of kdoctor-io
+# Copyright 2024 Authors of kdoctor-io
 # SPDX-License-Identifier: Apache-2.0
 
 # usage:

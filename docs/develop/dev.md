@@ -14,7 +14,7 @@
 
 ## chart develop
 
-helm repo add rocktemplate https://spidernet-io.github.io/rocktemplate
+helm repo add koffloader https://koffloader-io.github.io/koffloader
 
 ## test 
 
@@ -22,7 +22,7 @@ helm repo add rocktemplate https://spidernet-io.github.io/rocktemplate
 ```shell
 
 cat <<EOF > mybook1.yaml
-apiVersion: rocktemplate.spidernet.io/v1
+apiVersion: koffloader.koffloader.io/v1
 kind: Mybook
 metadata:
   name: test1
@@ -35,7 +35,7 @@ kubectl apply -f mybook1.yaml
 
 
 cat <<EOF > mybook2.yaml
-apiVersion: rocktemplate.spidernet.io/v1
+apiVersion: koffloader.koffloader.io/v1
 kind: Mybook
 metadata:
   name: test2

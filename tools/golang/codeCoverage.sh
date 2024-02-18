@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2022 Authors of spidernet-io
+# Copyright 2024 Authors of koffloader-io
 # SPDX-License-Identifier: Apache-2.0
 
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"

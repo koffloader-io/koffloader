@@ -1,13 +1,13 @@
-// Copyright 2022 Authors of spidernet-io
+// Copyright 2024 Authors of koffloader-io
 // SPDX-License-Identifier: Apache-2.0
 package example_test
 
 import (
 	"testing"
 
+	e2e "github.com/koffloader-io/e2eframework/framework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	e2e "github.com/spidernet-io/e2eframework/framework"
 	// "k8s.io/apimachinery/pkg/runtime"
 )
 
