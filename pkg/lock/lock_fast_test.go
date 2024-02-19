@@ -7,9 +7,11 @@
 package lock_test
 
 import (
-	. "github.com/onsi/ginkgo/v2"
-	"github.com/koffloader-io/koffloader/pkg/lock"
 	"time"
+
+	. "github.com/onsi/ginkgo/v2"
+
+	"github.com/koffloader-io/koffloader/pkg/lock"
 )
 
 var _ = Describe("LockFast", Label("unitest"), func() {

@@ -38,7 +38,7 @@ unitestreport.json
 e2ereport.json
 
 .DS_Store
-
+.idea/
 .vscode/
 *.plist
 

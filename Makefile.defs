@@ -4,8 +4,6 @@ GO_VERSION := 1.21.7
 REGISTER ?= ghcr.io
 GIT_REPO ?= koffloader-io/koffloader
 
-
-
 #======================
 
 SHELL := /bin/bash
@@ -18,10 +16,14 @@ INSTALL = install
 
 PREFIX?=/usr
 BINDIR?=$(PREFIX)/bin
-TARGETARCH ?= amd64
 
-DESTDIR_BIN ?= $(ROOT_DIR)/output/$(TARGETARCH)/bin
-DESTDIR_BASH_COMPLETION ?= $(ROOT_DIR)/output/$(TARGETARCH)/bash-completion
+ARCH = $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+    ARCH=amd64
+endif
+
+DESTDIR_BIN ?= $(ROOT_DIR)/output/$(ARCH)/bin
+DESTDIR_BASH_COMPLETION ?= $(ROOT_DIR)/output/$(ARCH)/bash-completion
 
 CHART_DIR := $(ROOT_DIR)/charts
 DESTDIR_CHART ?= $(ROOT_DIR)/output/chart
