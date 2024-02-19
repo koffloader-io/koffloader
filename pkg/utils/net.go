@@ -5,9 +5,10 @@ package utils
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"net"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func ListHostAllInterfaces() ([]string, error) {

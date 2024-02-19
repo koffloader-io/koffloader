@@ -5,10 +5,12 @@ package utils_test
 
 import (
 	"fmt"
+	"net"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
 	"github.com/koffloader-io/koffloader/pkg/utils"
-	"net"
 )
 
 var _ = Describe("net", func() {

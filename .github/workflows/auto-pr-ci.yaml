@@ -229,6 +229,7 @@ jobs:
     with:
       ref: ${{ needs.prepare.outputs.ref }}
       ipfamily: dual
+      install_cilium: true
       e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
       kind_node_image: ${{ needs.prepare.outputs.kindNodeImage }}
     secrets: inherit
@@ -240,6 +241,7 @@ jobs:
     with:
       ref: ${{ needs.prepare.outputs.ref }}
       ipfamily: ipv4
+      install_cilium: true
       e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
       kind_node_image: ${{ needs.prepare.outputs.kindNodeImage }}
     secrets: inherit
@@ -251,6 +253,7 @@ jobs:
     with:
       ref: ${{ needs.prepare.outputs.ref }}
       ipfamily: ipv6
+      install_cilium: true
       e2e_labels: ${{ needs.prepare.outputs.e2e_labels }}
       kind_node_image: ${{ needs.prepare.outputs.kindNodeImage }}
     secrets: inherit

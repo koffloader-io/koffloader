@@ -1,0 +1,69 @@
+#============ e2e-kind-config ====================
+E2E_CLUSTER_NAME ?= koffloader
+
+# iptables,ipvs or none, default iptables
+ifeq ($(DISABLE_KUBE_PROXY),true)
+    E2E_KUBE_PROXY_MODE ?= none
+else
+    E2E_KUBE_PROXY_MODE ?= iptables
+endif
+
+E2E_CHINA_IMAGE_REGISTRY ?= false
+
+# ipv4 or ipv6 or dual, default ipv4
+E2E_IP_FAMILY ?= dual
+
+# kubernetes version
+E2E_KIND_IMAGE ?= kindest/node
+E2E_KIND_IMAGE_TAG ?= v1.27.1
+E2E_KIND_NODE_IMAGE := $(E2E_KIND_IMAGE):$(E2E_KIND_IMAGE_TAG)
+# with kind default version
+
+ifeq ($(E2E_CHINA_IMAGE_REGISTRY),true)
+    E2E_KIND_IMAGE_NAME ?= docker.m.daocloud.io/kindest/node
+else
+    E2E_KIND_IMAGE_NAME ?= docker.io/kindest/node
+endif
+
+# disable default cni, default true
+E2E_DISABLE_DEFAULT_CNI ?= true
+
+KIND_CLUSTER_IDS=1 2 3
+KIND_CLUSTER_NAMES=$(E2E_CLUSTER_NAME)-1 $(E2E_CLUSTER_NAME)-2 $(E2E_CLUSTER_NAME)-3
+KIND_CLUSTER_KUBECONFIGS=$(CLUSTER_DIR)/$(E2E_CLUSTER_NAME)-1/.kube/config $(CLUSTER_DIR)/$(E2E_CLUSTER_NAME)-2/.kube/config $(CLUSTER_DIR)/$(E2E_CLUSTER_NAME)-3/.kube/config
+KIND_CLUSTER_SERVICE_DUAL_CIDRS=10.233.0.0/18,fd00:10:233::/116 10.234.0.0/18,fd00:10:234::/116 10.235.0.0/18,fd00:10:235::/116
+KIND_CLUSTER_SERVICE_IPV4_CIDRS=10.233.0.0/18 10.234.0.0/18 10.235.0.0/18
+KIND_CLUSTER_SERVICE_IPV6_CIDRS=fd00:10:233::/116 fd00:10:234::/116 fd00:10:235::/116
+KIND_CLUSTER_POD_DUAL_CIDRS=10.233.64.0/18,fd00:10:233:64::/64 10.234.64.0/18,fd00:10:234:64::/64 10.235.64.0/18,fd00:10:235:64::/64
+KIND_CLUSTER_POD_IPV4_CIDRS=10.233.64.0/18 10.234.64.0/18 10.235.64.0/18
+KIND_CLUSTER_POD_IPV6_CIDRS=fd00:10:233:64::/64 fd00:10:234:64::/64 fd00:10:235:64::/64
+
+INSTALL_CILIUM ?= false
+
+#============Image version===========
+ifeq ($(E2E_CHINA_IMAGE_REGISTRY),true)
+  TEST_IMAGE_NAME ?= docker.m.daocloud.io/alpine:latest
+else
+  TEST_IMAGE_NAME ?= docker.io/alpine:latest
+endif
+
+#============Tmp Path================
+# do not modify this ,it is also written on CI workflow file
+DOWNLOAD_DIR := $(ROOT_DIR)/test/.download
+CLUSTER_DIR := $(ROOT_DIR)/test/.cluster
+GLOBAL_KIND_CONFIG_PATH := $(ROOT_DIR)/test/yamls/global-kind.yaml
+
+#============ cilium ================
+ifeq ($(E2E_CHINA_IMAGE_REGISTRY),true)
+    E2E_CILIUM_IMAGE_REPO ?= "quay.m.daocloud.io"
+else
+    E2E_CILIUM_IMAGE_REPO ?= "quay.io"
+endif
+
+CILIUM_VERSION ?=
+
+CILIUM_CLUSTER_IPV4_CIDRS=10.243.64.0/18 10.244.64.0/18 10.245.64.0/18
+CILIUM_CLUSTER_IPV6_CIDRS=fd00:10:243:64::/112 fd00:10:244:64::/112 fd00:10:245:64::/112
+
+#============http proxy================
+HTTP_PROXY ?=

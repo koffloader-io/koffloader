@@ -25,6 +25,9 @@ on:
       kind_node_image:
         required: false
         type: string
+      install_cilium:
+        required: false
+        type: string
 
 jobs:
   e2e_against_commit:
@@ -115,9 +118,9 @@ jobs:
           max_attempts: 3
           shell: bash
           command: |
-            make e2e_init -e E2E_KIND_CLUSTER_NAME=${{ env.RUN_KIND_CLUSTER_NAME }} \
-                -e PROJECT_IMAGE_VERSION=${{ inputs.ref }} \
+            make e2e_init -e PROJECT_IMAGE_VERSION=${{ inputs.ref }} \
                 -e E2E_IP_FAMILY=${{ inputs.ipfamily }} \
+                -e INSTALL_CILIUM=${{ inputs.install_cilium }} \
                 -e PYROSCOPE_LOCAL_PORT='' \
                 -e E2E_KIND_NODE_IMAGE=${{ inputs.kind_node_image }}
 

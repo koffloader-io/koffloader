@@ -11,15 +11,17 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
-	"github.com/koffloader-io/koffloader/pkg/types"
-	"github.com/pkg/errors"
-	"k8s.io/client-go/util/cert"
-	"k8s.io/client-go/util/keyutil"
-	netutils "k8s.io/utils/net"
 	"math/big"
 	"net"
 	"os"
 	"time"
+
+	"github.com/pkg/errors"
+	"k8s.io/client-go/util/cert"
+	"k8s.io/client-go/util/keyutil"
+	netutils "k8s.io/utils/net"
+
+	"github.com/koffloader-io/koffloader/pkg/types"
 )
 
 const (

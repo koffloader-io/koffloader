@@ -1,66 +1,141 @@
 include ../Makefile.defs
+include Makefile.defs
 
-
-.PHONY: init_kind_env
-init_kind_env:
-	make init_one_kind -e KIND_CONFIG_PATH=./kindconfig/global-kind.yaml -e KIND_CLUSTER_NAME=$(E2E_KIND_CLUSTER_NAME) -e KIND_KUBECONFIG=$(E2E_KIND_KUBECONFIG_PATH)
+.PHONY: kind-init
+kind-init: check_env prepare
+	@echo -e "\033[35mInit kind for the cluster \033[0m"
+	make setup_three_kind
+	@if [ "$(INSTALL_CILIUM)" == "true" ] ; then \
+  		echo -e "\033[35m install cilium for the clusters \033[0m" ;\
+		make install_cilium_on_all_cluster ; \
+	fi ;
 	make install_proscope
+	@echo "success init kind clusters"
+	@echo ""
+	@echo "-----------------------------------------------------------------------------------------------------"
+	@echo "       ip family: $(E2E_IP_FAMILY)"
+	@for CLUSTER_ID in $(KIND_CLUSTER_IDS); do \
+		E2E_KIND_CLUSTER_NAME=$$(echo $(KIND_CLUSTER_NAMES) | cut -d ' ' -f $$CLUSTER_ID); \
+		KIND_CLUSTER_KUBECONFIG=$$(echo $(KIND_CLUSTER_KUBECONFIGS) | cut -d ' ' -f $$CLUSTER_ID); \
+		echo -e "       cluster name: " $$E2E_KIND_CLUSTER_NAME; \
+		echo -e "       cluster kubeconfig:" $$KIND_CLUSTER_KUBECONFIG ; \
+		echo "" ;\
+	done
+	@echo "-----------------------------------------------------------------------------------------------------"
+	@echo ""
 
 
-.PHONY: init_one_kind
-init_one_kind: KIND_CONFIG_PATH ?=
-init_one_kind: KIND_CLUSTER_NAME ?=
-init_one_kind: KIND_KUBECONFIG ?=
-init_one_kind: checkBin clean
-	@echo "================== init kind cluster $(KIND_CLUSTER_NAME) KIND_CONFIG_PATH=$(KIND_CONFIG_PATH) KIND_KUBECONFIG=$(KIND_KUBECONFIG) E2E_IP_FAMILY=$(E2E_IP_FAMILY)"
-	[ -n $(KIND_CLUSTER_NAME) ] || { echo "error, miss KIND_CLUSTER_NAME " ; exit 1 ; }
-	[ -f $(KIND_CONFIG_PATH) ] || { echo "error, miss file KIND_CONFIG_PATH=$(KIND_CONFIG_PATH)" ; exit 1 ; }
-	- mkdir -p $(E2E_RUNTIME_DIR) || true
-	NEW_KIND_YAML=$(E2E_RUNTIME_DIR)/kind_config_$(KIND_CLUSTER_NAME).yaml ;\
-		INSERT_LINE=` grep "insert subnet inform" $(KIND_CONFIG_PATH) -n | awk -F':' '{print $$1}' ` ; \
-		echo "insert after line $${INSERT_LINE}" ;\
-		sed  ''"$${INSERT_LINE}"' a \  ipFamily: $(E2E_IP_FAMILY)' $(KIND_CONFIG_PATH) > $${NEW_KIND_YAML} ; \
+.PHONY: setup_one_kind
+setup_one_kind: E2E_KIND_CLUSTER_NAME ?=
+setup_one_kind: E2E_KIND_SERVICE_CIDR ?=
+setup_one_kind: E2E_KIND_POD_CIDR ?=
+setup_one_kind: KIND_CLUSTER_KUBECONFIG ?=
+setup_one_kind:
+	export E2E_IP_FAMILY=$(E2E_IP_FAMILY) ; \
+	echo E2E_IP_FAMILY=$(E2E_IP_FAMILY) ; \
+	export CLUSTER_DIR=$(CLUSTER_DIR) ; \
+	echo CLUSTER_DIR=$(CLUSTER_DIR) ; \
+	export E2E_KUBE_PROXY_MODE=$(E2E_KUBE_PROXY_MODE) ; \
+	echo E2E_KUBE_PROXY_MODE=$(E2E_KUBE_PROXY_MODE) ; \
+	export E2E_KIND_NODE_IMAGE=$(E2E_KIND_NODE_IMAGE) ; \
+	echo E2E_KIND_NODE_IMAGE=$(E2E_KIND_NODE_IMAGE) ; \
+	export GLOBAL_KIND_CONFIG_PATH=$(GLOBAL_KIND_CONFIG_PATH) ; \
+	echo GLOBAL_KIND_CONFIG_PATH=$(GLOBAL_KIND_CONFIG_PATH) ; \
+	export E2E_DISABLE_DEFAULT_CNI=$(E2E_DISABLE_DEFAULT_CNI) ; \
+	echo E2E_DISABLE_DEFAULT_CNI=$(E2E_DISABLE_DEFAULT_CNI) ; \
+	export E2E_KIND_CLUSTER_NAME=$$E2E_KIND_CLUSTER_NAME ; \
+	echo E2E_KIND_CLUSTER_NAME=$$E2E_KIND_CLUSTER_NAME ; \
+	export E2E_KIND_SERVICE_CIDR=$$E2E_KIND_SERVICE_CIDR ; \
+	echo E2E_KIND_SERVICE_CIDR=$$E2E_KIND_SERVICE_CIDR ; \
+	export E2E_KIND_POD_CIDR=$$E2E_KIND_POD_CIDR ; \
+	echo E2E_KIND_POD_CIDR=$$E2E_KIND_POD_CIDR ; \
+	export KIND_CLUSTER_KUBECONFIG=$$KIND_CLUSTER_KUBECONFIG ; \
+	echo KIND_CLUSTER_KUBECONFIG=$$KIND_CLUSTER_KUBECONFIG ; \
+	echo setup $$E2E_KIND_CLUSTER_NAME kind cluster; \
+	bash $(ROOT_DIR)/test/scripts/init-kind.sh ;
+
+
+.PHONY: setup_three_kind
+setup_three_kind:
+	@for CLUSTER_ID in $(KIND_CLUSTER_IDS); do \
+		E2E_KIND_CLUSTER_NAME=$$(echo $(KIND_CLUSTER_NAMES) | cut -d ' ' -f $$CLUSTER_ID); \
 		if [ "$(E2E_IP_FAMILY)" == "ipv4" ] ; then \
-			sed -i  ''"$${INSERT_LINE}"' a \  podSubnet: "$(E2E_KIND_IPV4_POD_CIDR)"' $${NEW_KIND_YAML} ;\
-			sed -i  ''"$${INSERT_LINE}"' a \  serviceSubnet: "$(E2E_KIND_IPV4_SERVICE_CIDR)"' $${NEW_KIND_YAML} ;\
+			E2E_KIND_SERVICE_CIDR=$$(echo $(KIND_CLUSTER_SERVICE_IPV4_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+			E2E_KIND_POD_CIDR=$$(echo $(KIND_CLUSTER_POD_IPV4_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
 		elif [ "$(E2E_IP_FAMILY)" == "ipv6" ] ; then \
-			sed -i  ''"$${INSERT_LINE}"' a \  podSubnet: "$(E2E_KIND_IPV6_POD_CIDR)"' $${NEW_KIND_YAML} ; \
-			sed -i  ''"$${INSERT_LINE}"' a \  serviceSubnet: "$(E2E_KIND_IPV6_SERVICE_CIDR)"' $${NEW_KIND_YAML} ; \
+			E2E_KIND_SERVICE_CIDR=$$(echo $(KIND_CLUSTER_SERVICE_IPV6_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+			E2E_KIND_POD_CIDR=$$(echo $(KIND_CLUSTER_POD_IPV6_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
 		else \
-			sed -i  ''"$${INSERT_LINE}"' a \  podSubnet: "$(E2E_KIND_IPV4_POD_CIDR),$(E2E_KIND_IPV6_POD_CIDR)"' $${NEW_KIND_YAML}  ; \
-			sed -i  ''"$${INSERT_LINE}"' a \  serviceSubnet: "$(E2E_KIND_IPV4_SERVICE_CIDR),$(E2E_KIND_IPV6_SERVICE_CIDR)"' $${NEW_KIND_YAML}  ; \
-  		fi
-	- sysctl -w net.ipv6.conf.all.disable_ipv6=0 || true
-	- sysctl -w fs.inotify.max_user_watches=524288 || true
-	- sysctl -w fs.inotify.max_user_instances=8192  || true
-	- kind delete cluster --name  $(KIND_CLUSTER_NAME)
-	KIND_OPTION="" ; \
- 		[ -n "$(E2E_KIND_NODE_IMAGE)" ] && KIND_OPTION=" --image $(E2E_KIND_NODE_IMAGE) " && echo "setup kind with E2E_KIND_NODE_IMAGE=$(E2E_KIND_NODE_IMAGE)"; \
- 		kind create cluster --name  $(KIND_CLUSTER_NAME) --config $(E2E_RUNTIME_DIR)/kind_config_$(KIND_CLUSTER_NAME).yaml --kubeconfig $(KIND_KUBECONFIG) $${KIND_OPTION}
-	- kubectl --kubeconfig $(KIND_KUBECONFIG) taint nodes --all node-role.kubernetes.io/master- || true
-	- kubectl --kubeconfig $(KIND_KUBECONFIG) taint nodes --all node-role.kubernetes.io/control-plane- || true
-	@echo "===================== deploy prometheus CRD ========== "
-	# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml ; } \
-	kubectl apply --kubeconfig $(KIND_KUBECONFIG)  -f ./yaml/monitoring.coreos.com_servicemonitors.yaml
-	# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml ; } \
-	kubectl apply --kubeconfig $(KIND_KUBECONFIG) -f ./yaml/monitoring.coreos.com_podmonitors.yaml
-	# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml ; } \
-	kubectl apply --kubeconfig $(KIND_KUBECONFIG) -f ./yaml/monitoring.coreos.com_prometheusrules.yaml
-	# https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml  ; } \
-	kubectl apply --kubeconfig $(KIND_KUBECONFIG) -f ./yaml/monitoring.coreos.com_probes.yaml
-	# https://raw.githubusercontent.com/grafana-operator/grafana-operator/master/deploy/manifests/latest/crds.yaml  ; } \
-	kubectl apply --kubeconfig $(KIND_KUBECONFIG) -f ./yaml/grafanadashboards.yaml
-	echo "show kubernetes node image " && docker ps
-	@echo "========================================================"
-	@echo "   deploy kind cluster $(KIND_CLUSTER_NAME)             "
-	@echo "   export KUBECONFIG=$(KIND_KUBECONFIG)                 "
-	@echo "   kubectl get pod -o wide -A                           "
-	@echo "========================================================"
+			E2E_KIND_SERVICE_CIDR=$$(echo $(KIND_CLUSTER_SERVICE_DUAL_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+			E2E_KIND_POD_CIDR=$$(echo $(KIND_CLUSTER_POD_DUAL_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+		fi ; \
+		KIND_CLUSTER_KUBECONFIG=$$(echo $(KIND_CLUSTER_KUBECONFIGS) | cut -d ' ' -f $$CLUSTER_ID); \
+		make setup_one_kind -e E2E_KIND_CLUSTER_NAME=$$E2E_KIND_CLUSTER_NAME \
+				-e E2E_KIND_SERVICE_CIDR=$$E2E_KIND_SERVICE_CIDR \
+				-e E2E_KIND_POD_CIDR=$$E2E_KIND_POD_CIDR \
+				-e KIND_CLUSTER_KUBECONFIG=$$KIND_CLUSTER_KUBECONFIG; \
+	done
 
 
-.PHONY: checkBin
-checkBin:
-	$(ROOT_DIR)/test/scripts/installE2eTools.sh
+.PHONY: install_cilium
+install_cilium: E2E_KIND_CLUSTER_NAME ?=
+install_cilium: CILIUM_CLUSTER_ID ?=
+install_cilium: E2E_IP_FAMILY ?= $E2E_IP_FAMILY
+install_cilium: KIND_CLUSTER_KUBECONFIG ?=
+install_cilium: HTTP_PROXY ?=
+install_cilium: CILIUM_CLUSTER_IPV4_CIDR ?=
+install_cilium: CILIUM_CLUSTER_IPV6_CIDR ?=
+install_cilium: E2E_CILIUM_IMAGE_REPO ?= $(E2E_CILIUM_IMAGE_REPO)
+install_cilium:
+	echo "install cilium on" $(E2E_KIND_CLUSTER_NAME) ; \
+	export E2E_KIND_CLUSTER_NAME=$(E2E_KIND_CLUSTER_NAME); \
+	echo E2E_KIND_CLUSTER_NAME=$(E2E_KIND_CLUSTER_NAME); \
+	export CILIUM_CLUSTER_ID=$(CILIUM_CLUSTER_ID); \
+	echo CILIUM_CLUSTER_ID=$(CILIUM_CLUSTER_ID); \
+	export E2E_IP_FAMILY=$(E2E_IP_FAMILY); \
+	echo E2E_IP_FAMILY=$(E2E_IP_FAMILY); \
+	export KIND_CLUSTER_KUBECONFIG=$(KIND_CLUSTER_KUBECONFIG); \
+	echo KIND_CLUSTER_KUBECONFIG=$(KIND_CLUSTER_KUBECONFIG); \
+	export HTTP_PROXY=$(HTTP_PROXY); \
+	echo HTTP_PROXY=$(HTTP_PROXY); \
+	export E2E_CILIUM_IMAGE_REPO=$(E2E_CILIUM_IMAGE_REPO); \
+	echo E2E_CILIUM_IMAGE_REPO=$(E2E_CILIUM_IMAGE_REPO); \
+	export CILIUM_CLUSTER_IPV4_CIDR=$(CILIUM_CLUSTER_IPV4_CIDR); \
+	echo CILIUM_CLUSTER_IPV4_CIDR=$(CILIUM_CLUSTER_IPV4_CIDR); \
+	export CILIUM_CLUSTER_IPV6_CIDR=$(CILIUM_CLUSTER_IPV6_CIDR); \
+	echo CILIUM_CLUSTER_IPV6_CIDR=$(CILIUM_CLUSTER_IPV6_CIDR); \
+	bash $(ROOT_DIR)/test/scripts/install-cilium.sh ;
+
+
+.PHONY: install_cilium_on_all_cluster
+install_cilium_on_all_cluster:
+	@for CLUSTER_ID in $(KIND_CLUSTER_IDS); do \
+		E2E_KIND_CLUSTER_NAME=$$(echo $(KIND_CLUSTER_NAMES) | cut -d ' ' -f $$CLUSTER_ID); \
+  		CILIUM_CLUSTER_ID=$$CLUSTER_ID ; \
+		KIND_CLUSTER_KUBECONFIG=$$(echo $(KIND_CLUSTER_KUBECONFIGS) | cut -d ' ' -f $$CLUSTER_ID); \
+		CILIUM_CLUSTER_IPV4_CIDR=$$(echo $(CILIUM_CLUSTER_IPV4_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+		CILIUM_CLUSTER_IPV6_CIDR=$$(echo $(CILIUM_CLUSTER_IPV6_CIDRS) | cut -d ' ' -f $$CLUSTER_ID); \
+		make install_cilium -e E2E_KIND_CLUSTER_NAME=$$E2E_KIND_CLUSTER_NAME -e CILIUM_CLUSTER_ID=$$CILIUM_CLUSTER_ID \
+			-e E2E_IP_FAMILY=$(E2E_IP_FAMILY) -e KIND_CLUSTER_KUBECONFIG=$$KIND_CLUSTER_KUBECONFIG \
+			-e HTTP_PROXY=$(HTTP_PROXY) -e E2E_CILIUM_IMAGE_REPO=$(E2E_CILIUM_IMAGE_REPO) \
+			-e CILIUM_CLUSTER_IPV4_CIDR=$$CILIUM_CLUSTER_IPV4_CIDR -e CILIUM_CLUSTER_IPV6_CIDR=$$CILIUM_CLUSTER_IPV6_CIDR; \
+	done
+
+
+.PHONY: prepare
+prepare:
+	echo -e "\033[35m Check The Tools For Ready: \033[0m"
+	$(QUIET) JUST_CLI_CHECK=true scripts/install-tools.sh
+	$(QUIET) mkdir -p $(DOWNLOAD_DIR)
+	$(QUIET) IMAGE_LIST="" ; \
+		 [ -n "$(PYROSCOPE_LOCAL_PORT)" ] && IMAGE_LIST+=" $(IMAGE_PYROSCOPE_NAME) " ; \
+		 IMAGE_LIST+=" $(TEST_IMAGE_NAME) " ; \
+		 ARCH=$(ARCH) IMAGE_LIST="$${IMAGE_LIST}" \
+		 	CNI_PACKAGE_VERSION=$(CNI_PACKAGE_VERSION)  scripts/prepare.sh $(DOWNLOAD_DIR)
+	- sudo sysctl -w fs.inotify.max_user_watches=524288 || true
+	- sudo sysctl -w fs.inotify.max_user_instances=8192 || true
+	- sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+
 
 .PHONY: install_proscope
 install_proscope:
@@ -74,7 +149,11 @@ install_proscope:
 		echo "finish setuping pyroscope " ; \
       fi
 
-
+.PHONY: check_env
+check_env:
+	$(QUIET) [ -n "$(E2E_CLUSTER_NAME)" ] || { echo "error, miss E2E_CLUSTER_NAME " ; false ; }
+	$(QUIET) ( [ "$(E2E_IP_FAMILY)" == "ipv4" ] || [ "$(E2E_IP_FAMILY)" == "ipv6" ]  || [ "$(E2E_IP_FAMILY)" == "dual" ] ) \
+			|| { echo "error, E2E_IP_FAMILY=$(E2E_IP_FAMILY) must be ipv4/ipv6/dual" ;  exit 1 ; }
 
 #==================
 
@@ -167,10 +246,10 @@ install_example_app:
 	@ KUBECONFIG=$(KIND_KUBECONFIG)  kubectl get pod -o wide -A
 
 
-.PHONY: clean
-clean:
-	-@ kind delete cluster --name $(E2E_KIND_CLUSTER_NAME)
-	-@ rm -rf $(E2E_RUNTIME_DIR)
+.PHONY: clean_e2e
+clean_e2e:
+	@rm -rf $(CLUSTER_DIR)
+	-@  kind get clusters | xargs -n1  kind delete cluster --name
 	-@ docker stop $(PYROSCOPE_CONTAINER_NAME) &>/dev/null
 	-@ docker rm $(PYROSCOPE_CONTAINER_NAME) &>/dev/null
 
