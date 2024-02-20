@@ -1,10 +1,9 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-name: network-chart
+name: koffloader-kind
 networking:
-  # insert subnet inform
+  # insert inform
   apiServerAddress: 127.0.0.1
-  kubeProxyMode: iptables
 kubeadmConfigPatches:
   - |
     kind: ClusterConfiguration
@@ -13,6 +12,7 @@ kubeadmConfigPatches:
     apiServer:
         extraArgs:
           enable-admission-plugins: NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook
+          enable-aggregator-routing: "true"
 
 nodes:
   - role: control-plane
