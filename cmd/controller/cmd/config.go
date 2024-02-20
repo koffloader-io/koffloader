@@ -4,14 +4,16 @@
 package cmd
 
 import (
-	"github.com/koffloader-io/koffloader/pkg/logger"
-	"github.com/koffloader-io/koffloader/pkg/types"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 	"os"
 	"reflect"
 	"strconv"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+
+	"github.com/koffloader-io/koffloader/pkg/logger"
+	"github.com/koffloader-io/koffloader/pkg/types"
 )
 
 func init() {
@@ -25,16 +27,16 @@ func init() {
 		rootLogger.Info("ENV_LOG_LEVEL is empty ")
 	}
 
-	logger := rootLogger.Named("config")
+	l := rootLogger.Named("config")
 	// env built in the image
 	if t := viper.GetString("ENV_VERSION"); len(t) > 0 {
-		logger.Info("app version " + t)
+		l.Info("app version " + t)
 	}
 	if t := viper.GetString("ENV_GIT_COMMIT_VERSION"); len(t) > 0 {
-		logger.Info("git commit version " + t)
+		l.Info("git commit version " + t)
 	}
 	if t := viper.GetString("ENV_GIT_COMMIT_TIMESTAMP"); len(t) > 0 {
-		logger.Info("git commit timestamp " + t)
+		l.Info("git commit timestamp " + t)
 	}
 
 	for n, v := range types.ControllerEnvMapping {
@@ -49,7 +51,7 @@ func init() {
 					r := types.ControllerEnvMapping[n].DestVar.(*int32)
 					*r = int32(s)
 				} else {
-					logger.Fatal("failed to parse env value of " + v.EnvName + " to int32, value=" + m)
+					l.Fatal("failed to parse env value of " + v.EnvName + " to int32, value=" + m)
 				}
 			case *string:
 				r := types.ControllerEnvMapping[n].DestVar.(*string)
@@ -59,14 +61,14 @@ func init() {
 					r := types.ControllerEnvMapping[n].DestVar.(*bool)
 					*r = s
 				} else {
-					logger.Fatal("failed to parse env value of " + v.EnvName + " to bool, value=" + m)
+					l.Fatal("failed to parse env value of " + v.EnvName + " to bool, value=" + m)
 				}
 			default:
-				logger.Sugar().Fatal("unsupported type to parse %v, config type=%v ", v.EnvName, reflect.TypeOf(v.DestVar))
+				l.Sugar().Fatal("unsupported type to parse %v, config type=%v ", v.EnvName, reflect.TypeOf(v.DestVar))
 			}
 		}
 
-		logger.Info(v.EnvName + " = " + m)
+		l.Info(v.EnvName + " = " + m)
 	}
 
 	// command flags
@@ -76,22 +78,22 @@ func init() {
 	globalFlag.StringVarP(&types.ControllerConfig.TlsServerCertPath, "tls-server-cert", "T", "", "server cert file path")
 	globalFlag.StringVarP(&types.ControllerConfig.TlsServerKeyPath, "tls-server-key", "Y", "", "server key file path")
 	if e := viper.BindPFlags(globalFlag); e != nil {
-		logger.Sugar().Fatalf("failed to BindPFlags, reason=%v", e)
+		l.Sugar().Fatalf("failed to BindPFlags, reason=%v", e)
 	}
 	printFlag := func() {
-		logger.Info("config-path = " + types.ControllerConfig.ConfigMapPath)
-		logger.Info("tls-ca-cert = " + types.ControllerConfig.TlsCaCertPath)
-		logger.Info("tls-server-cert = " + types.ControllerConfig.TlsServerCertPath)
-		logger.Info("tls-server-key = " + types.ControllerConfig.TlsServerKeyPath)
+		l.Info("config-path = " + types.ControllerConfig.ConfigMapPath)
+		l.Info("tls-ca-cert = " + types.ControllerConfig.TlsCaCertPath)
+		l.Info("tls-server-cert = " + types.ControllerConfig.TlsServerCertPath)
+		l.Info("tls-server-key = " + types.ControllerConfig.TlsServerKeyPath)
 
 		// load configmap
 		if len(types.ControllerConfig.ConfigMapPath) > 0 {
 			configmapBytes, err := os.ReadFile(types.ControllerConfig.ConfigMapPath)
 			if nil != err {
-				logger.Sugar().Fatalf("failed to read configmap file %v, error: %v", types.ControllerConfig.ConfigMapPath, err)
+				l.Sugar().Fatalf("failed to read configmap file %v, error: %v", types.ControllerConfig.ConfigMapPath, err)
 			}
 			if err := yaml.Unmarshal(configmapBytes, &types.ControllerConfig.Configmap); nil != err {
-				logger.Sugar().Fatalf("failed to parse configmap data, error: %v", err)
+				l.Sugar().Fatalf("failed to parse configmap data, error: %v", err)
 			}
 		}
 	}

@@ -8,7 +8,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1"
+	v1beta1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1beta1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -39,9 +39,13 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=koffloader.koffloader.io, Version=v1
-	case v1.SchemeGroupVersion.WithResource("kclusters"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Koffloader().V1().Kclusters().Informer()}, nil
+	// Group=koffloader.koffloader.io, Version=v1beta1
+	case v1beta1.SchemeGroupVersion.WithResource("kclusters"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Koffloader().V1beta1().KClusters().Informer()}, nil
+	case v1beta1.SchemeGroupVersion.WithResource("kclustergroups"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Koffloader().V1beta1().KClusterGroups().Informer()}, nil
+	case v1beta1.SchemeGroupVersion.WithResource("serviceexportpolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Koffloader().V1beta1().ServiceExportPolicies().Informer()}, nil
 
 	}
 
