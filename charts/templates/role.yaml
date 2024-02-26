@@ -61,6 +61,26 @@ rules:
 - apiGroups:
   - koffloader.koffloader.io
   resources:
+  - kclustergroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - koffloader.koffloader.io
+  resources:
+  - kclustergroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - koffloader.koffloader.io
+  resources:
   - kclusters
   verbs:
   - create
@@ -74,6 +94,26 @@ rules:
   - koffloader.koffloader.io
   resources:
   - kclusters/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - koffloader.koffloader.io
+  resources:
+  - serviceexportpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - koffloader.koffloader.io
+  resources:
+  - serviceexportpolicies/status
   verbs:
   - get
   - patch

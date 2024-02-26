@@ -216,7 +216,7 @@ koffloaderController:
   ## @param koffloaderController.replicas the replicas number of koffloaderController pod
   replicas: 1
 
-  ## @param koffloaderController.binName the binName name of koffloaderController
+  ## @param koffloaderController.cmdBinName the binName name of koffloaderController
   cmdBinName: "/usr/bin/controller"
 
   ## @param koffloaderController.hostnetwork enable hostnetwork mode of koffloaderController pod. Notice, if no CNI available before template installation, must enable this
@@ -315,7 +315,7 @@ koffloaderController:
     minAvailable: 1
 
   httpServer:
-    ## @param koffloaderController.port the http Port for koffloaderController, for health checking and http service
+    ## @param koffloaderController.httpServer.port the http Port for koffloaderController, for health checking and http service
     port: 5720
 
     startupProbe:

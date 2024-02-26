@@ -7,8 +7,8 @@ package fake
 
 import (
 	clientset "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned"
-	koffloaderv1 "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned/typed/koffloader.koffloader.io/v1"
-	fakekoffloaderv1 "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned/typed/koffloader.koffloader.io/v1/fake"
+	koffloaderv1beta1 "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned/typed/koffloader.koffloader.io/v1beta1"
+	fakekoffloaderv1beta1 "github.com/koffloader-io/koffloader/pkg/k8s/client/clientset/versioned/typed/koffloader.koffloader.io/v1beta1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -66,7 +66,7 @@ var (
 	_ testing.FakeClient  = &Clientset{}
 )
 
-// KoffloaderV1 retrieves the KoffloaderV1Client
-func (c *Clientset) KoffloaderV1() koffloaderv1.KoffloaderV1Interface {
-	return &fakekoffloaderv1.FakeKoffloaderV1{Fake: &c.Fake}
+// KoffloaderV1beta1 retrieves the KoffloaderV1beta1Client
+func (c *Clientset) KoffloaderV1beta1() koffloaderv1beta1.KoffloaderV1beta1Interface {
+	return &fakekoffloaderv1beta1.FakeKoffloaderV1beta1{Fake: &c.Fake}
 }

@@ -18,7 +18,7 @@ webhooks:
         name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/mutate-koffloader-koffloader-io-v1-kcluster"
+        path: "/mutate-koffloader-koffloader-io-v1beta1-kcluster"
         port: {{ .Values.koffloaderController.webhookPort }}
       {{- if (eq .Values.koffloaderController.tls.method "provided") }}
       caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
@@ -33,16 +33,74 @@ webhooks:
           # ====modify====
           - koffloader.koffloader.io
         apiVersions:
-          - v1
+          - v1beta1
         operations:
           - CREATE
           - UPDATE
-          - DELETE
         resources:
           # ====modify==== crdName
           - kclusters
     sideEffects: None
-
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        namespace: {{ .Release.Namespace }}
+        # ====modify==== the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
+        path: "/mutate-koffloader-koffloader-io-v1beta1-kclustergroup"
+        port: {{ .Values.koffloaderController.webhookPort }}
+      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
+      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+      caBundle: {{ .ca.Cert | b64enc }}
+      {{- end }}
+    failurePolicy: Fail
+    # ====modify====
+    name: kclustergroup.koffloader.koffloader.io
+    rules:
+      - apiGroups:
+          # ====modify====
+          - koffloader.koffloader.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          # ====modify==== crdName
+          - kclustergroups
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        namespace: {{ .Release.Namespace }}
+        # ====modify==== the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
+        path: "/mutate-koffloader-koffloader-io-v1beta1-serviceexportpolicy"
+        port: {{ .Values.koffloaderController.webhookPort }}
+      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
+      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+      caBundle: {{ .ca.Cert | b64enc }}
+      {{- end }}
+    failurePolicy: Fail
+    # ====modify====
+    name: serviceexportpolicy.koffloader.koffloader.io
+    rules:
+      - apiGroups:
+          # ====modify====
+          - koffloader.koffloader.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          # ====modify==== crdName
+          - serviceexportpolicies
+    sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -60,7 +118,7 @@ webhooks:
         name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
         namespace: {{ .Release.Namespace }}
         # ====modify==== the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
-        path: "/validate-koffloader-koffloader-io-v1-kcluster"
+        path: "/validate-koffloader-koffloader-io-v1beta1-kcluster"
         port: {{ .Values.koffloaderController.webhookPort }}
       {{- if (eq .Values.koffloaderController.tls.method "provided") }}
       caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
@@ -75,14 +133,73 @@ webhooks:
           # ====modify====
           - koffloader.koffloader.io
         apiVersions:
-          - v1
+          - v1beta1
         operations:
           - CREATE
           - UPDATE
-          - DELETE
         resources:
           # ====modify==== crdName
           - kclusters
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        namespace: {{ .Release.Namespace }}
+        # ====modify==== the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
+        path: "/validate-koffloader-koffloader-io-v1beta1-kclustergroup"
+        port: {{ .Values.koffloaderController.webhookPort }}
+      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
+      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+      caBundle: {{ .ca.Cert | b64enc }}
+      {{- end }}
+    failurePolicy: Fail
+    # ====modify====
+    name: kclustergroup.koffloader.koffloader.io
+    rules:
+      - apiGroups:
+          # ====modify====
+          - koffloader.koffloader.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          # ====modify==== crdName
+          - kclustergroups
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ .Values.koffloaderController.name | trunc 63 | trimSuffix "-" }}
+        namespace: {{ .Release.Namespace }}
+        # ====modify==== the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
+        path: "/validate-koffloader-koffloader-io-v1beta1-serviceexportpolicy"
+        port: {{ .Values.koffloaderController.webhookPort }}
+      {{- if (eq .Values.koffloaderController.tls.method "provided") }}
+      caBundle: {{ .Values.koffloaderController.tls.provided.tlsCa | required "missing tls.provided.tlsCa" }}
+      {{- else if (eq .Values.koffloaderController.tls.method "auto") }}
+      caBundle: {{ .ca.Cert | b64enc }}
+      {{- end }}
+    failurePolicy: Fail
+    # ====modify====
+    name: serviceexportpolicy.koffloader.koffloader.io
+    rules:
+      - apiGroups:
+          # ====modify====
+          - koffloader.koffloader.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          # ====modify==== crdName
+          - serviceexportpolicies
     sideEffects: None
 
 {{- if eq .Values.koffloaderController.tls.method "certmanager" -}}

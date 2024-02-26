@@ -246,8 +246,8 @@ install_example_app:
 	@ KUBECONFIG=$(KIND_KUBECONFIG)  kubectl get pod -o wide -A
 
 
-.PHONY: clean_e2e
-clean_e2e:
+.PHONY: clean
+clean:
 	@rm -rf $(CLUSTER_DIR)
 	-@  kind get clusters | xargs -n1  kind delete cluster --name
 	-@ docker stop $(PYROSCOPE_CONTAINER_NAME) &>/dev/null

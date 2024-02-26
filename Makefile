@@ -50,9 +50,9 @@ echo "Build Image $(IMAGE_NAME):$(IMAGE_TAG)" ; \
 				--build-arg GIT_COMMIT_VERSION=$(GIT_COMMIT_VERSION) \
 				--build-arg GIT_COMMIT_TIME=$(GIT_COMMIT_TIME) \
 				--build-arg VERSION=$(GIT_COMMIT_VERSION) \
-				--build-arg BUILDPLATFORM="linux/$(TARGETARCH)" \
-				--build-arg TARGETPLATFORM="linux/$(TARGETARCH)" \
-				--build-arg TARGETARCH=$(TARGETARCH) \
+				--build-arg BUILDPLATFORM="linux/$(ARCH)" \
+				--build-arg TARGETPLATFORM="linux/$(ARCH)" \
+				--build-arg TARGETARCH=$(ARCH) \
 				--build-arg TARGETOS=linux \
 				--file $(DOCKERFILE_PATH) \
 				--tag ${IMAGE_NAME}:$(IMAGE_TAG) . ; \
@@ -92,9 +92,9 @@ IMAGE_DIR=` dirname $(DOCKERFILE_PATH) ` ; \
 		echo "Build base image $(BASE_IMAGE_NAME):$${TAG}" ; \
 		docker build  \
 				--build-arg USE_PROXY_SOURCE=true \
-				--build-arg TARGETPLATFORM="linux/$(TARGETARCH)" \
-				--build-arg BUILDPLATFORM="linux/$(TARGETARCH)" \
-				--build-arg TARGETARCH=$(TARGETARCH) \
+				--build-arg TARGETPLATFORM="linux/$(ARCH)" \
+				--build-arg BUILDPLATFORM="linux/$(ARCH)" \
+				--build-arg TARGETARCH=$(ARCH) \
 				--build-arg TARGETOS=linux \
 				--file $(DOCKERFILE_PATH) \
 				--output type=docker \

@@ -3,5 +3,6 @@
 package types
 
 const (
-	TlsCaCommonName = "koffloader.io"
+	ControllerElectorLockName = "kdoctor-controller-lease"
+	TlsCaCommonName           = "koffloader.io"
 )
