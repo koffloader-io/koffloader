@@ -45,6 +45,7 @@ fi
 rm -rf ${OUTPUT_PKG} || true
 
 export GOPATH="${GO_PATH_DIR}"
+chmod +x ${PROJECT_ROOT}/${CODEGEN_PKG}/generate-internal-groups.sh
 bash ${PROJECT_ROOT}/${CODEGEN_PKG}/generate-groups.sh "client,informer,lister" \
   ${MODULE_NAME}/${OUTPUT_PKG} \
   ${MODULE_NAME}/${APIS_PKG} \

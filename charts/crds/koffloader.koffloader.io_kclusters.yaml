@@ -4,7 +4,6 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (unknown)
-  creationTimestamp: null
   name: kclusters.koffloader.koffloader.io
 spec:
   group: koffloader.koffloader.io
@@ -21,12 +20,16 @@ spec:
   versions:
   - additionalPrinterColumns:
     - description: clusterConnector
-      jsonPath: .spec.clusterConnector.type
+      jsonPath: .status.ClusterConnector
       name: clusterConnector
       type: string
     - description: kClusterGroup
       jsonPath: .status.kClusterGroup
       name: kClusterGroup
+      type: string
+    - description: connectStatus
+      jsonPath: .status.connectStatus
+      name: connectStatus
       type: string
     name: v1beta1
     schema:
@@ -48,10 +51,22 @@ spec:
             properties:
               clusterConnector:
                 properties:
-                  ciliumNamespace:
-                    type: string
-                  type:
-                    type: string
+                  cilium:
+                    properties:
+                      clustermeshServiceType:
+                        enum:
+                        - LoadBalancer
+                        - NodePort
+                        - ClusterIP
+                        type: string
+                      enableClustermesh:
+                        default: true
+                        type: boolean
+                      namespace:
+                        type: string
+                    type: object
+                  submariner:
+                    type: boolean
                 type: object
               kubeconfig:
                 properties:
@@ -65,9 +80,12 @@ spec:
             properties:
               clusterConnector:
                 type: string
+              connectStatus:
+                type: string
               kClusterGroup:
                 type: string
             required:
+            - connectStatus
             - kClusterGroup
             type: object
         required:

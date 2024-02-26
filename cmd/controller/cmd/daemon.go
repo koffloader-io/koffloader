@@ -5,9 +5,16 @@ package cmd
 
 import (
 	"context"
+	"github.com/go-logr/logr"
+	"github.com/koffloader-io/koffloader/pkg/ciliumManager"
+	"github.com/koffloader-io/koffloader/pkg/multiClusterManager"
+	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"syscall"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -20,6 +27,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	controllerruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/koffloader-io/koffloader/pkg/debug"
 	koffloaderv1beta1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1beta1"
@@ -34,6 +42,18 @@ var scheme = runtime.NewScheme()
 func init() {
 	utilruntime.Must(koffloaderv1beta1.AddToScheme(scheme))
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
+	// init ~/.kube/config
+	cfg, _ := clientcmd.Write(*clientcmdapi.NewConfig())
+	err := os.Mkdir(types.KubeConfigLocalDir, 0750)
+	if err != nil {
+		rootLogger.Sugar().Errorf("falied create kubeconfig dir,reason=%v", err)
+	}
+	f, err := os.OpenFile(types.KubeConfigLocalPath, os.O_CREATE|os.O_WRONLY, 0660)
+	if err != nil {
+		rootLogger.Sugar().Errorf("falied create kubeconfig,reason=%v", err)
+	}
+	defer f.Close()
+	_, _ = f.Write(cfg)
 }
 
 func SetupUtility() {
@@ -74,8 +94,11 @@ func DaemonMain() {
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     "0",
 		HealthProbeBindAddress: "0",
+		Metrics: server.Options{
+			CertDir:     filepath.Dir(types.ControllerConfig.TlsServerCertPath),
+			BindAddress: "0",
+		},
 
 		// lease
 		LeaderElection:          true,
@@ -83,24 +106,32 @@ func DaemonMain() {
 		LeaderElectionID:        types.ControllerElectorLockName,
 
 		// webhook port
-		Port:    int(types.ControllerConfig.WebhookPort),
-		CertDir: filepath.Dir(types.ControllerConfig.TlsServerCertPath),
-
-		// for this not watched obj, get directly from api-server
-		ClientDisableCacheFor: []client.Object{
-			&corev1.Node{},
-			&corev1.Namespace{},
-			&corev1.Pod{},
-			&corev1.Service{},
-			&appsv1.Deployment{},
-			&appsv1.StatefulSet{},
-			&appsv1.ReplicaSet{},
-			&appsv1.DaemonSet{},
-		},
+		WebhookServer: webhook.NewServer(webhook.Options{
+			Port:    int(types.ControllerConfig.WebhookPort),
+			CertDir: filepath.Dir(types.ControllerConfig.TlsServerCertPath),
+		}),
+		Client: client.Options{Cache: &client.CacheOptions{
+			DisableFor: []client.Object{
+				&corev1.Node{},
+				&corev1.Namespace{},
+				&corev1.Pod{},
+				&corev1.Service{},
+				&appsv1.Deployment{},
+				&appsv1.StatefulSet{},
+				&appsv1.ReplicaSet{},
+				&appsv1.DaemonSet{},
+			},
+		}},
 	})
 	if err != nil {
 		logger.Sugar().Fatalf("failed to NewManager, reason=%v", err)
 	}
+
+	// set logger for controller-runtime framework
+	// The controller-runtime would print debug stack if we do not init the log previously: https://github.com/kubernetes-sigs/controller-runtime/pull/2357
+	ctrl.SetLogger(logr.New(controllerruntimelog.NullLogSink{}))
+	ciliumManager.InitCiliumManager(logger.Named("CiliumManager"))
+	multiClusterManager.InitMultiClusterManager(mgr.GetClient(), logger.Named("MultilClusterManager"))
 
 	// run koffloader controller
 	kclusterManager.RunKClusterController(logger, mgr)

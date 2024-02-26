@@ -4,7 +4,6 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (unknown)
-  creationTimestamp: null
   name: kclustergroups.koffloader.koffloader.io
 spec:
   group: koffloader.koffloader.io
@@ -23,6 +22,10 @@ spec:
     - description: clusterConnectorType
       jsonPath: .spec.clusterConnectorType
       name: clusterConnectorType
+      type: string
+    - description: ConnectStatus
+      jsonPath: .status.connectStatus
+      name: ConnectStatus
       type: string
     name: v1beta1
     schema:
@@ -97,12 +100,12 @@ spec:
             properties:
               clusterConnectorType:
                 type: string
+              connectStatus:
+                type: string
               matchKCluster:
                 items:
                   type: string
-                type: string
-            required:
-            - matchKCluster
+                type: array
             type: object
         required:
         - metadata
