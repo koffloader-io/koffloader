@@ -23,7 +23,6 @@ import (
 	"go/scanner"
 	"go/token"
 	"go/types"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -111,7 +110,7 @@ func (p *Package) NeedSyntax() {
 	for i, filename := range p.CompiledGoFiles {
 		go func(i int, filename string) {
 			defer wg.Done()
-			src, err := ioutil.ReadFile(filename)
+			src, err := os.ReadFile(filename)
 			if err != nil {
 				p.AddError(err)
 				return
@@ -404,7 +403,11 @@ func LoadRootsWithConfig(cfg *packages.Config, roots ...string) ([]*Package, err
 	loadPackages := func(roots ...string) ([]*Package, error) {
 		rawPkgs, err := packages.Load(l.cfg, roots...)
 		if err != nil {
-			return nil, err
+			loadRoot := l.cfg.Dir
+			if l.cfg.Dir == "" {
+				loadRoot, _ = os.Getwd()
+			}
+			return nil, fmt.Errorf("load packages in root %q: %w", loadRoot, err)
 		}
 		var pkgs []*Package
 		for _, rp := range rawPkgs {
