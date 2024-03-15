@@ -3,7 +3,7 @@
 
 # ====modify====
 ARG BASE_IMAGE=ghcr.io/koffloader-io/koffloader-agent-base:d21fad99238f6e3c206fc86826e5fc27677608dd
-ARG GOLANG_IMAGE=docker.io/library/golang:1.21.7
+ARG GOLANG_IMAGE=docker.io/library/golang:1.22.0
 
 #======= build bin ==========
 # use BUILDPLATFORM to cross build

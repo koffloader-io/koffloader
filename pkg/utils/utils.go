@@ -73,3 +73,15 @@ EXE:
 
 	return
 }
+
+func MergeMap[M map[Key]Value, Key comparable, Value any](m1 M, m2 M) M {
+	m := make(M)
+	for k, v := range m1 {
+		m[k] = v
+	}
+	for k, v := range m2 {
+		m[k] = v
+	}
+	return m
+
+}

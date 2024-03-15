@@ -7,6 +7,7 @@ import (
 	"context"
 	crd "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1beta1"
 	"go.uber.org/zap"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -33,19 +34,22 @@ func RunServiceExportPolicyController(l *zap.Logger, mgr ctrl.Manager) {
 	wh.SetupWebhookWithManager(mgr)
 }
 
-func (kcr *serviceExportPolicyReconciler) Reconcile(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
+func (sepr *serviceExportPolicyReconciler) Reconcile(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 	obj := &crd.ServiceExportPolicy{}
-	if err := kcr.client.Get(ctx, req.NamespacedName, obj); err != nil {
-		kcr.logger.Sugar().Errorf("failed get ServiceExportPolicy,reason=%v", err)
+	if err := sepr.client.Get(ctx, req.NamespacedName, obj); err != nil {
+		sepr.logger.Sugar().Errorf("failed get ServiceExportPolicy,reason=%v", err)
+		if errors.IsNotFound(err) {
+			return reconcile.Result{}, client.IgnoreNotFound(err)
+		}
 	}
-	kcr.logger.Sugar().Infof("get reconcile")
+	sepr.logger.Sugar().Infof("reconcile handle get %v ", obj)
 	return reconcile.Result{}, nil
 }
 
-func (kcr *serviceExportPolicyReconciler) SetupWithManager(mgr ctrl.Manager) {
+func (sepr *serviceExportPolicyReconciler) SetupWithManager(mgr ctrl.Manager) {
 	if err := ctrl.NewControllerManagedBy(mgr).
 		For(&crd.ServiceExportPolicy{}).
-		Complete(kcr); err != nil {
-		kcr.logger.Sugar().Fatalf("failed to builder ServiceExportPolicy reconcile, error=%v", err)
+		Complete(sepr); err != nil {
+		sepr.logger.Sugar().Fatalf("failed to builder ServiceExportPolicy reconcile, error=%v", err)
 	}
 }

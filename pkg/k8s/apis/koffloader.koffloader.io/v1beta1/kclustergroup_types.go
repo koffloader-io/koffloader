@@ -13,6 +13,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	KGroupStatusCreat   = "Creating"
+	KGroupStatusConnect = "Connecting"
+)
+
 type KClusterGroupSpec struct {
 	// +kubebuilder:validation:Required
 	ClusterConnectorType *string `json:"clusterConnectorType,omitempty"`
@@ -22,16 +27,20 @@ type KClusterGroupSpec struct {
 }
 
 type KClusterGroupStatus struct {
-	// +kubebuilder:validation:Type:=string
-	MatchKCluster []string `json:"matchKCluster"`
+	// +kubebuilder:validation:Optional
+	MatchKCluster []string `json:"matchKCluster,omitempty"`
 
-	// +kubebuilder:validation:Type:=string
+	// +kubebuilder:validation:Optional
+	ConnectStatus string `json:"connectStatus,omitempty"`
+
+	// +kubebuilder:validation:Optional
 	ClusterConnectorType string `json:"clusterConnectorType,omitempty"`
 }
 
 // scope(Namespaced or Cluster)
 // +kubebuilder:resource:categories={koffloader},path="kclustergroups",singular="kclustergroup",scope="Cluster",shortName={kcg}
 // +kubebuilder:printcolumn:JSONPath=".spec.clusterConnectorType",description="clusterConnectorType",name="clusterConnectorType",type=string
+// +kubebuilder:printcolumn:JSONPath=".status.connectStatus",description="ConnectStatus",name="ConnectStatus",type=string
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +genclient

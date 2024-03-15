@@ -11,7 +11,6 @@ import (
 	v1beta1 "github.com/koffloader-io/koffloader/pkg/k8s/apis/koffloader.koffloader.io/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -22,9 +21,9 @@ type FakeKClusterGroups struct {
 	Fake *FakeKoffloaderV1beta1
 }
 
-var kclustergroupsResource = schema.GroupVersionResource{Group: "koffloader.koffloader.io", Version: "v1beta1", Resource: "kclustergroups"}
+var kclustergroupsResource = v1beta1.SchemeGroupVersion.WithResource("kclustergroups")
 
-var kclustergroupsKind = schema.GroupVersionKind{Group: "koffloader.koffloader.io", Version: "v1beta1", Kind: "KClusterGroup"}
+var kclustergroupsKind = v1beta1.SchemeGroupVersion.WithKind("KClusterGroup")
 
 // Get takes name of the kClusterGroup, and returns the corresponding kClusterGroup object, and an error if there is any.
 func (c *FakeKClusterGroups) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1beta1.KClusterGroup, err error) {

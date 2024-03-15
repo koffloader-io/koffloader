@@ -5,6 +5,7 @@ package serviceExportPolicyManager
 
 import (
 	"context"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	"go.uber.org/zap"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -24,14 +25,14 @@ type serviceExportPolicyWebHook struct {
 var _ webhook.CustomValidator = (*serviceExportPolicyWebHook)(nil)
 
 // mutating webhook
-func (kw *serviceExportPolicyWebHook) Default(ctx context.Context, obj runtime.Object) error {
-	logger := kw.logger.Named("mutating wehbook")
+func (sepw *serviceExportPolicyWebHook) Default(ctx context.Context, obj runtime.Object) error {
+	logger := sepw.logger.Named("mutating wehbook")
 
 	r, ok := obj.(*crd.ServiceExportPolicy)
 	if !ok {
-		kw := "failed to get obj"
-		logger.Error(kw)
-		return apierrors.NewBadRequest(kw)
+		err := "failed to get obj"
+		logger.Error(err)
+		return apierrors.NewBadRequest(err)
 	}
 	logger.Sugar().Infof("obj: %+v", r)
 
@@ -39,66 +40,66 @@ func (kw *serviceExportPolicyWebHook) Default(ctx context.Context, obj runtime.O
 
 }
 
-func (kw *serviceExportPolicyWebHook) ValidateCreate(ctx context.Context, obj runtime.Object) error {
-	logger := kw.logger.Named("validating create webhook")
+func (sepw *serviceExportPolicyWebHook) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	logger := sepw.logger.Named("validating create webhook")
 
 	r, ok := obj.(*crd.ServiceExportPolicy)
 	if !ok {
-		kw := "failed to get obj"
-		logger.Error(kw)
-		return apierrors.NewBadRequest(kw)
+		err := "failed to get obj"
+		logger.Error(err)
+		return admission.Warnings{}, apierrors.NewBadRequest(err)
 	}
 	logger.Sugar().Infof("obj: %+v", r)
 
-	return nil
+	return admission.Warnings{}, nil
 }
 
-func (kw *serviceExportPolicyWebHook) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) error {
-	logger := kw.logger.Named("validating update webhook")
+func (sepw *serviceExportPolicyWebHook) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
+	logger := sepw.logger.Named("validating update webhook")
 
 	old, ok := oldObj.(*crd.ServiceExportPolicy)
 	if !ok {
-		kw := "failed to get oldObj"
-		logger.Error(kw)
-		return apierrors.NewBadRequest(kw)
+		err := "failed to get oldObj"
+		logger.Error(err)
+		return admission.Warnings{}, apierrors.NewBadRequest(err)
 	}
-	new, ok := newObj.(*crd.ServiceExportPolicy)
+	newsep, ok := newObj.(*crd.ServiceExportPolicy)
 	if !ok {
-		kw := "failed to get newObj"
-		logger.Error(kw)
-		return apierrors.NewBadRequest(kw)
+		err := "failed to get newObj"
+		logger.Error(err)
+		return admission.Warnings{}, apierrors.NewBadRequest(err)
 	}
 	logger.Sugar().Infof("oldObj: %+v", old)
-	logger.Sugar().Infof("newObj: %+v", new)
+	logger.Sugar().Infof("newObj: %+v", newsep)
 
-	return nil
+	return admission.Warnings{}, nil
 }
 
 // ValidateDelete implements webhook.CustomValidator so a webhook will be registered for the type
-func (kw *serviceExportPolicyWebHook) ValidateDelete(ctx context.Context, obj runtime.Object) error {
-	logger := kw.logger.Named("validating delete webhook")
+func (sepw *serviceExportPolicyWebHook) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
+	logger := sepw.logger.Named("validating delete webhook")
 
 	r, ok := obj.(*crd.ServiceExportPolicy)
 	if !ok {
-		kw := "failed to get obj"
-		logger.Error(kw)
-		return apierrors.NewBadRequest(kw)
+		err := "failed to get obj"
+		logger.Error(err)
+		return admission.Warnings{}, apierrors.NewBadRequest(err)
 	}
 	logger.Sugar().Infof("obj: %+v", r)
 
-	return nil
+	return admission.Warnings{}, nil
 }
 
 // --------------------
 
-func (kw *serviceExportPolicyWebHook) SetupWebhookWithManager(mgr ctrl.Manager) {
+func (sepw *serviceExportPolicyWebHook) SetupWebhookWithManager(mgr ctrl.Manager) {
 	// the mutating route path : "/mutate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
 	// the validate route path : "/validate-" + strings.ReplaceAll(gvk.Group, ".", "-") + "-" + gvk.Version + "-" + strings.ToLower(gvk.Kind)
 	if e := ctrl.NewWebhookManagedBy(mgr).
 		For(&crd.ServiceExportPolicy{}).
-		WithDefaulter(kw).
-		WithValidator(kw).
+		WithDefaulter(sepw).
+		WithValidator(sepw).
 		Complete(); e != nil {
-		kw.logger.Sugar().Fatalf("failed to NewWebhookManagedBy, reason=%v", e)
+		sepw.logger.Sugar().Fatalf("failed to NewWebhookManagedBy, reason=%v", e)
 	}
 }
